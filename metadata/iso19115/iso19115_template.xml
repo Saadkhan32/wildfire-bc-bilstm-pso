@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- ISO 19115-2 metadata template. Replace every {{PLACEHOLDER}} per raster. -->
+<gmi:MI_Metadata
+  xmlns:gmi="http://www.isotc211.org/2005/gmi"
+  xmlns:gmd="http://www.isotc211.org/2005/gmd"
+  xmlns:gco="http://www.isotc211.org/2005/gco"
+  xmlns:gml="http://www.opengis.net/gml/3.2">
+  <gmd:fileIdentifier><gco:CharacterString>{{FILE_IDENTIFIER}}</gco:CharacterString></gmd:fileIdentifier>
+  <gmd:language><gco:CharacterString>eng</gco:CharacterString></gmd:language>
+  <gmd:hierarchyLevel>
+    <gmd:MD_ScopeCode codeListValue="dataset" codeList="">dataset</gmd:MD_ScopeCode>
+  </gmd:hierarchyLevel>
+  <gmd:contact>
+    <gmd:CI_ResponsibleParty>
+      <gmd:individualName><gco:CharacterString>Khan, Muhammad S.</gco:CharacterString></gmd:individualName>
+      <gmd:organisationName><gco:CharacterString>University of Prince Edward Island</gco:CharacterString></gmd:organisationName>
+      <gmd:role><gmd:CI_RoleCode codeListValue="pointOfContact" codeList="">pointOfContact</gmd:CI_RoleCode></gmd:role>
+    </gmd:CI_ResponsibleParty>
+  </gmd:contact>
+  <gmd:dateStamp><gco:Date>{{YYYY-MM-DD}}</gco:Date></gmd:dateStamp>
+  <gmd:metadataStandardName><gco:CharacterString>ISO 19115-2</gco:CharacterString></gmd:metadataStandardName>
+  <gmd:metadataStandardVersion><gco:CharacterString>2009</gco:CharacterString></gmd:metadataStandardVersion>
+  <gmd:referenceSystemInfo>
+    <gmd:MD_ReferenceSystem>
+      <gmd:referenceSystemIdentifier>
+        <gmd:RS_Identifier>
+          <gmd:code><gco:CharacterString>EPSG:3005</gco:CharacterString></gmd:code>
+        </gmd:RS_Identifier>
+      </gmd:referenceSystemIdentifier>
+    </gmd:MD_ReferenceSystem>
+  </gmd:referenceSystemInfo>
+  <gmd:identificationInfo>
+    <gmd:MD_DataIdentification>
+      <gmd:citation>
+        <gmd:CI_Citation>
+          <gmd:title><gco:CharacterString>{{TITLE}}</gco:CharacterString></gmd:title>
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date><gco:Date>{{YYYY-MM-DD}}</gco:Date></gmd:date>
+              <gmd:dateType><gmd:CI_DateTypeCode codeListValue="creation" codeList="">creation</gmd:CI_DateTypeCode></gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+          <gmd:identifier>
+            <gmd:MD_Identifier>
+              <gmd:code><gco:CharacterString>{{ZENODO_DOI}}</gco:CharacterString></gmd:code>
+            </gmd:MD_Identifier>
+          </gmd:identifier>
+        </gmd:CI_Citation>
+      </gmd:citation>
+      <gmd:abstract><gco:CharacterString>{{ABSTRACT 2-3 sentences}}</gco:CharacterString></gmd:abstract>
+      <gmd:status><gmd:MD_ProgressCode codeListValue="completed" codeList="">completed</gmd:MD_ProgressCode></gmd:status>
+      <gmd:spatialResolution>
+        <gmd:MD_Resolution>
+          <gmd:distance><gco:Distance uom="m">1000</gco:Distance></gmd:distance>
+        </gmd:MD_Resolution>
+      </gmd:spatialResolution>
+      <gmd:language><gco:CharacterString>eng</gco:CharacterString></gmd:language>
+      <gmd:topicCategory><gmd:MD_TopicCategoryCode>environment</gmd:MD_TopicCategoryCode></gmd:topicCategory>
+      <gmd:extent>
+        <gmd:EX_Extent>
+          <gmd:geographicElement>
+            <gmd:EX_GeographicBoundingBox>
+              <gmd:westBoundLongitude><gco:Decimal>-139.06</gco:Decimal></gmd:westBoundLongitude>
+              <gmd:eastBoundLongitude><gco:Decimal>-114.03</gco:Decimal></gmd:eastBoundLongitude>
+              <gmd:southBoundLatitude><gco:Decimal>48.30</gco:Decimal></gmd:southBoundLatitude>
+              <gmd:northBoundLatitude><gco:Decimal>60.00</gco:Decimal></gmd:northBoundLatitude>
+            </gmd:EX_GeographicBoundingBox>
+          </gmd:geographicElement>
+        </gmd:EX_Extent>
+      </gmd:extent>
+    </gmd:MD_DataIdentification>
+  </gmd:identificationInfo>
+  <gmd:dataQualityInfo>
+    <gmd:DQ_DataQuality>
+      <gmd:scope>
+        <gmd:DQ_Scope>
+          <gmd:level><gmd:MD_ScopeCode codeListValue="dataset" codeList="">dataset</gmd:MD_ScopeCode></gmd:level>
+        </gmd:DQ_Scope>
+      </gmd:scope>
+      <gmd:lineage>
+        <gmd:LI_Lineage>
+          <gmd:statement><gco:CharacterString>{{LINEAGE: how the raster was produced}}</gco:CharacterString></gmd:statement>
+        </gmd:LI_Lineage>
+      </gmd:lineage>
+    </gmd:DQ_DataQuality>
+  </gmd:dataQualityInfo>
+</gmi:MI_Metadata>

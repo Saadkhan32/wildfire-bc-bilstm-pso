@@ -1,0 +1,38 @@
+﻿cff-version: 1.2.0
+title: "wildfire-bc-bilstm-pso"
+message: "If you use this software, please cite both the article and the archived software (DOI)."
+type: software
+authors:
+  - family-names: Khan
+    given-names: Muhammad S.
+    affiliation: "University of Prince Edward Island"
+  - family-names: Farooque
+    given-names: Aitazaz A.
+    email: afarooque@upei.ca
+    affiliation: "University of Prince Edward Island"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: Al-Mughrabi
+    given-names: Tatiana
+    affiliation: "University of Prince Edward Island"
+  - family-names: Malekian
+    given-names: Raheleh
+    affiliation: "University of Prince Edward Island"
+  - family-names: Wang
+    given-names: Xander
+    affiliation: "University of Prince Edward Island"
+  - family-names: Esau
+    given-names: Travis J.
+    affiliation: "Dalhousie University"
+  - family-names: Uz Zaman
+    given-names: Qamar
+    affiliation: "Dalhousie University"
+license: MIT
+repository-code: "https://github.com/Saadkhan32/wildfire-bc-bilstm-pso"
+keywords:
+  - wildfire susceptibility
+  - interpretable deep learning
+  - BiLSTM
+  - particle swarm optimization
+  - SHAP
+  - British Columbia
+
