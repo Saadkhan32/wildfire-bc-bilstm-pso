@@ -59,3 +59,7 @@ data/rasters_bcalbers/
 # Python cache
 __pycache__/
 *.pyc
+
+# NFDB national wildfire database (110MB .dbf, exceeds GitHub 100MB limit)
+# Re-downloadable from CWFIS via src/day2_automation.py; full archive on Zenodo (Day 11).
+data/vectors_bcalbers/NFDB_poly_large.*
