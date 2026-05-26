@@ -43,3 +43,7 @@ desktop.ini
 .idea/
 *.swp
 *.env
+ 
+# R install / runtime logs 
+report.log 
+*.log 

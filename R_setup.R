@@ -1,4 +1,4 @@
-﻿# R/setup.R — Day 1 R environment bootstrap
+# R/setup.R — Day 1 R environment bootstrap
 if (!requireNamespace("renv", quietly = TRUE)) {
   install.packages("renv", repos = "https://cloud.r-project.org")
 }
