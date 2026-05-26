@@ -1,0 +1,3 @@
+index,pearson_r,pearson_p,spearman_rho,spearman_p,n
+mei_fs_mean,0.1023,0.6265,0.1138,0.5879,25
+pdo_fs_mean,-0.3062,0.1366,0.0777,0.712,25

@@ -1,0 +1,4 @@
+threshold_ha,n_fires,is_baseline
+50,2297,FALSE
+70,2034,TRUE
+100,1802,FALSE

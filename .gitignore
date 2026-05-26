@@ -47,3 +47,15 @@ desktop.ini
 # R install / runtime logs 
 report.log 
 *.log 
+
+# === Day 2 additions ===
+# ArcGIS Pro temporary lock files (per-machine, never commit)
+*.lock
+*.sr.lock
+
+# Reprojected raster outputs - large, will go to Zenodo deposit on Day 11
+data/rasters_bcalbers/
+
+# Python cache
+__pycache__/
+*.pyc
