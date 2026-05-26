@@ -1,4 +1,4 @@
-﻿cff-version: 1.2.0
+cff-version: 1.2.0
 title: "wildfire-bc-bilstm-pso"
 message: "If you use this software, please cite both the article and the archived software (DOI)."
 type: software

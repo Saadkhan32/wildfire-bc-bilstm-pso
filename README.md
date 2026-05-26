@@ -1,4 +1,4 @@
-﻿# wildfire-bc-bilstm-pso
+# wildfire-bc-bilstm-pso
 
 Code, data and metadata supporting Khan et al. (2026), "An Interpretable Deep
 Learning Framework for Wildfire Susceptibility and Exposure Assessment in
@@ -6,7 +6,7 @@ Western Canada", Ecological Informatics (manuscript ECOINF-D-26-01275).
 
 ## Citation
 Cite both the article and the archived release on Zenodo (DOI: see
-`metadata/zenodo_doi.txt`). A machine-readable citation is in `CITATION.cff`.
+`metadata/10.5281/zenodo.20389084.txt`). A machine-readable citation is in `CITATION.cff`.
 
 ## Licence
 Code: MIT (see `LICENSE`). Derived raster products on Zenodo: CC-BY 4.0.

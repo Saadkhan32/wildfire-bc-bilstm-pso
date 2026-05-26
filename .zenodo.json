@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "wildfire-bc-bilstm-pso: An Interpretable Deep Learning Framework for Wildfire Susceptibility and Exposure Assessment in Western Canada",
   "description": "Code, data and metadata supporting Khan et al. (2026), Ecological Informatics (ECOINF-D-26-01275). BiLSTM-PSO modelling pipeline, ISO 19115-2 metadata, CSVW JSON-LD data dictionaries, spatial-block cross-validation, SHAP interpretability, and a cross-border benchmark against US Wildfire Hazard Potential, LANDFIRE Burn Probability and Wildfire Risk to Communities products. All spatial layers in NAD 1983 BC Environment Albers (EPSG:3005). MIT-licensed code; CC-BY 4.0 derived data.",
   "upload_type": "software",
