@@ -1,19 +1,19 @@
-variable,moran_I,moran_z,moran_p,interp
-aet,0.020513,2.100826,0.035656,random
-aspect,0.098559,9.5202,0,weak cluster
-distance_f,0.867964,83.089032,0,strong cluster
-distance_1,0.266874,25.567705,0,moderate cluster
-distance_t,0.880704,84.270908,0,strong cluster
-elevation,0.124724,12.124153,0,weak cluster
-lulc,0.022647,2.325921,0.020023,random
-ndvi,-0.002832,-0.236698,0.812891,random
-pdsi,0.048861,5.261927,0,random
-plan_curv,0.037721,3.698968,0.000216,random
-precip,0.194657,19.17736,0,moderate cluster
-profile_cu,0.037719,3.698773,0.000217,random
-rh,0.038328,3.86664,0.00011,random
-slope,0.098443,9.509518,0,weak cluster
-sm,0.019348,1.984237,0.047229,random
-temp,0.030862,3.135917,0.001713,random
-twi,0.053341,5.213359,0,weak cluster
-ws,0.030927,3.142471,0.001675,random
+variable,moran_I,moran_z,moran_p,interpretation
+aet,0.0201,1.97,0.0492,random
+aspect,0.1042,9.6,0.0,weak cluster
+distance_f,0.8654,78.95,0.0,strong cluster
+distance_1,0.2595,23.7,0.0,moderate cluster
+distance_t,0.876,79.87,0.0,strong cluster
+elevation,0.1244,11.53,0.0,weak cluster
+lulc,0.0253,2.49,0.0127,random
+ndvi,-0.0029,-0.23,0.8169,random
+pdsi,0.0613,6.49,0.0,weak cluster
+plan_curv,0.0488,4.55,0.0,random
+precip,0.1957,18.42,0.0,moderate cluster
+profile_cu,0.0487,4.55,0.0,random
+rh,0.0421,4.06,0.0,random
+slope,0.104,9.58,0.0,weak cluster
+sm,0.0188,1.84,0.0653,random
+temp,0.0341,3.32,0.0009,random
+twi,0.0531,4.95,0.0,weak cluster
+ws,0.0342,3.33,0.0009,random
