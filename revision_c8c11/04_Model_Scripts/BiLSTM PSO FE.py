@@ -43,8 +43,11 @@ def set_all_seeds(seed):
     np.random.seed(seed)
     tf.keras.utils.set_random_seed(seed)
     try:
-        tf.config.experimental.enable_op_determinism()
-    except AttributeError:
+        # TF 2.10 lacks deterministic GPU impl of UnsortedSegmentSum (used by
+        # Keras AUC metric); enable bit-level op-determinism only on CPU.
+        if not tf.config.list_physical_devices("GPU"):
+            tf.config.experimental.enable_op_determinism()
+    except (AttributeError, RuntimeError):
         pass
     os.environ["PYTHONHASHSEED"] = str(seed)
 

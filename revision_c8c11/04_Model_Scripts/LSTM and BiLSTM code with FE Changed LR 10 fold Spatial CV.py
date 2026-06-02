@@ -98,8 +98,11 @@ def set_all_seeds(seed=RANDOM_STATE):
     np.random.seed(seed)
     tf.keras.utils.set_random_seed(seed)
     try:
-        tf.config.experimental.enable_op_determinism()
-    except AttributeError:
+        # TF 2.10 lacks deterministic GPU impl of UnsortedSegmentSum (used by
+        # Keras AUC metric); enable bit-level op-determinism only on CPU.
+        if not tf.config.list_physical_devices("GPU"):
+            tf.config.experimental.enable_op_determinism()
+    except (AttributeError, RuntimeError):
         pass
     os.environ["PYTHONHASHSEED"] = str(seed)
 
@@ -423,65 +426,6 @@ def train_one_model_10fold(X_df: pd.DataFrame, y: np.ndarray, groups: np.ndarray
     print(f"[CV-OOF] {model_type.upper()}  ROC-AUC={cv_oof['roc_auc']:.4f}  "
           f"PR-AUC={cv_oof['pr_auc']:.4f}")
     return summary
-
-# --------------------------- MAIN TRAIN & SAVE -------------------------------
-def main():
-    set_all_seeds()
-
-    # paths & data
-    data_path, out_root = ask_paths()
-    df = read_table(data_path)
-    df = df.replace([-9999, -99999, 9999, 99999], np.nan)
-
-    # aspect + distance transforms (match loader preprocessing)
-    if ASPECT_KEY in df.columns:
-        df = add_aspect_sincos(df, ASPECT_KEY)
-        print(f"[INFO] Converted '{ASPECT_KEY}' -> Aspect_sin / Aspect_cos")
-    df = safe_log1p_inplace(df)
-
-    # spatial columns (excluded from training; used for GroupKFold blocks)
-    lon_name = find_col_contains(df, "long") or find_col_contains(df, "lon") or find_col_contains(df, "longitude")
-    lat_name = find_col_contains(df, "lati") or find_col_contains(df, "lat") or find_col_contains(df, "latitude")
-    drop_cols = [c for c in [lon_name, lat_name] if c]
-
-    if TARGET_NAME not in df.columns:
-        raise SystemExit(f"Label column '{TARGET_NAME}' not found.")
-
-    y = pd.to_numeric(df[TARGET_NAME], errors="coerce").fillna(0).astype(int).values
-    X = df.drop(columns=[TARGET_NAME] + drop_cols, errors="ignore").copy()
-    used_cols = list(X.columns)
-    print(f"[INFO] Feature columns used (raw): {len(used_cols)}")
-
-    # Spatial GroupKFold groups
-    if lon_name and lat_name:
-        lat_all = pd.to_numeric(df[lat_name], errors="coerce").values
-        lon_all = pd.to_numeric(df[lon_name], errors="coerce").values
-        groups = compute_block_ids(lat_all, lon_all, GRID_KM)
-        print(f"[INFO] Spatial groups: {len(np.unique(groups))} unique blocks (grid_km={GRID_KM})")
-    else:
-        raise SystemExit("Latitude/Longitude columns required for 10-fold spatial GroupKFold CV.")
-
-    # Train each model family with proper 10-fold spatial GroupKFold CV
-    for model_type in RUNS:
-        model_dir = os.path.join(out_root, model_type.upper())
-        os.makedirs(model_dir, exist_ok=True)
-        print(f"\n[Main] Training {model_type.upper()} ({EPOCHS} epochs x {N_FOLDS} folds)")
-        train_one_model_10fold(
-            X_df=X, y=y, groups=groups,
-            model_type=model_type, used_cols=used_cols,
-            lat_col=lat_name, lon_col=lon_name,
-            out_dir=model_dir, epochs=EPOCHS,
-        )
-
-    print("\n[DONE] Per-model folders ready (10-fold spatial CV artefacts):\n"
-          " - LSTM/\n - BILSTM/\n"
-          "Each contains: final_model.keras, static_preprocessor.joblib, "
-          "selected_features_final.csv, feature_meta.json, "
-          "cv_metrics_10fold.csv, cv_oof_predictions.csv, "
-          "metrics_summary.json, best_params.json.")
-
-if __name__ == "__main__":
-    main()
 
 # --------------------------- MAIN TRAIN & SAVE -------------------------------
 def main():
