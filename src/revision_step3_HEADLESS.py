@@ -1,45 +1,59 @@
 # -*- coding: utf-8 -*-
 """
-revision_step3_HEADLESS.py
-==========================
-Headless version of revision_step3_run_all_models.py.
+revision_step3_HEADLESS.py - split-workload production training.
 
-  - NO Tkinter dialogs (reads all paths from .revision_step3_paths.json)
-  - NO confirmation popup (auto-yes)
-  - All output goes to stdout/stderr -- redirect to a log file for monitoring
-  - Same resumable behaviour: skips combos with existing metrics_summary.json
-  - Same training behaviour: 6 PSO particles x 6 iters x 30 epochs
+Usage:
+    python src/revision_step3_HEADLESS.py --mode pso       # runs BiLSTM_PSO + LSTM_PSO only
+    python src/revision_step3_HEADLESS.py --mode nonpso    # runs non-PSO LSTM + BiLSTM only
+    python src/revision_step3_HEADLESS.py --mode all       # runs everything (default)
 
-Use this from Task Scheduler so it runs invisibly to other lab users.
-
-Run (interactive test):
-    set TF_FORCE_GPU_ALLOW_GROWTH=true
-    python src\revision_step3_HEADLESS.py
-
-Run (real -- via Task Scheduler or detached cmd, write log to OneDrive):
-    cmd /C "set TF_FORCE_GPU_ALLOW_GROWTH=true && python src\revision_step3_HEADLESS.py > "%OneDrive%\wildfire_training.log" 2>&1"
+Paths auto-detected from this script's location (no cache file needed).
+Resumable: skips combos with existing metrics_summary.json.
 """
 import os
 import sys
 import json
 import time
+import argparse
 import subprocess
 
 os.environ.setdefault("PYTHONUNBUFFERED", "1")
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+os.environ.setdefault("PYTHONUTF8", "1")
 try:
-    sys.stdout.reconfigure(line_buffering=True)
-    sys.stderr.reconfigure(line_buffering=True)
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
 except Exception:
     pass
 
-# Design
+# ----- CLI args -----
+ap = argparse.ArgumentParser()
+ap.add_argument("--mode", choices=["all", "pso", "nonpso"], default="all",
+                help="Which models to train: 'pso' (BiLSTM_PSO+LSTM_PSO), 'nonpso' (LSTM+BiLSTM), or 'all'")
+ap.add_argument("--python-exe", default=sys.executable,
+                help="Python interpreter to use for subprocesses (default: current python)")
+args = ap.parse_args()
+
+MODE = args.mode
+PYTHON_EXE = args.python_exe
+
+# ----- Auto-detect paths -----
+SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT   = os.path.dirname(SCRIPT_DIR)
+TABLES      = os.path.join(REPO_ROOT, "revision_c8c11", "03_Training_Tables")
+MODEL_DIR   = os.path.join(REPO_ROOT, "revision_c8c11", "04_Model_Scripts")
+BILSTM_PSO  = os.path.join(MODEL_DIR, "BiLSTM PSO FE.py")
+LSTM_PSO    = os.path.join(MODEL_DIR, "LSTM PSO FE.py")
+NONPSO_CLI  = os.path.join(SCRIPT_DIR, "c8c11_non_pso_cli.py")
+OUT_ROOT    = os.path.join(REPO_ROOT, "revision_c8c11", "05_Model_Results")
+
+# ----- Design -----
 SEEDS_AT_THR70    = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
 THRESHOLDS_AT_S42 = [100, 200]
 THR_MAIN          = 70
 SEED_MAIN         = 42
 
-# PSO budget (production)
+# ----- PSO production budget -----
 OBJECTIVE      = "roc"
 GRID_KM        = 50
 PROGRESS       = "none"
@@ -51,9 +65,6 @@ RETRAIN_EPOCHS = 30
 NONPSO_EPOCHS  = 30
 FORCE_RERUN    = False
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            ".revision_step3_paths.json")
-
 def stamp():
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -61,97 +72,78 @@ def log(msg):
     print(f"[{stamp()}] {msg}", flush=True)
 
 log("=" * 70)
-log("STEP 3 PRODUCTION (HEADLESS)")
+log(f"STEP 3 PRODUCTION (HEADLESS) -- MODE={MODE}")
 log("=" * 70)
+log(f"repo       = {REPO_ROOT}")
+log(f"tables     = {TABLES}")
+log(f"bilstm_pso = {BILSTM_PSO}")
+log(f"lstm_pso   = {LSTM_PSO}")
+log(f"nonpso_cli = {NONPSO_CLI}")
+log(f"out_root   = {OUT_ROOT}")
+log(f"python     = {PYTHON_EXE}")
 
-# Load cached paths
-if not os.path.exists(CONFIG_PATH):
-    log(f"FATAL: cache file not found: {CONFIG_PATH}")
-    log("Run revision_step3_PREFLIGHT.py once interactively first")
-    log("to populate the cache, then re-run this headless script.")
-    sys.exit(2)
+# Validate
+required_paths = {"tables": TABLES, "python_exe": PYTHON_EXE}
+if MODE in ("all", "pso"):
+    required_paths["bilstm_pso"] = BILSTM_PSO
+    required_paths["lstm_pso"] = LSTM_PSO
+if MODE in ("all", "nonpso"):
+    required_paths["nonpso_cli"] = NONPSO_CLI
 
-with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-    cache = json.load(f)
-
-required = ["tables", "bilstm_pso", "lstm_pso", "nonpso_cli", "python_exe"]
-missing = [k for k in required if not cache.get(k)]
-if missing:
-    log(f"FATAL: cache missing keys: {missing}")
-    sys.exit(2)
-
-tables      = cache["tables"]
-bilstm_pso  = cache["bilstm_pso"]
-lstm_pso    = cache["lstm_pso"]
-nonpso_cli  = cache["nonpso_cli"]
-python_exe  = cache["python_exe"]
-
-# Out_root: prefer "out_root" if present, else derive from "parent_dir"
-out_root = cache.get("out_root")
-if not out_root:
-    parent = cache.get("parent_dir")
-    if not parent:
-        log("FATAL: cache has no 'out_root' or 'parent_dir'")
-        sys.exit(2)
-    out_root = os.path.join(parent, "05_Model_Results")
-os.makedirs(out_root, exist_ok=True)
-
-log(f"tables     = {tables}")
-log(f"bilstm_pso = {bilstm_pso}")
-log(f"lstm_pso   = {lstm_pso}")
-log(f"nonpso_cli = {nonpso_cli}")
-log(f"out_root   = {out_root}")
-log(f"python     = {python_exe}")
-
-# Validate each path
-for k, v in [("tables", tables), ("bilstm_pso", bilstm_pso),
-             ("lstm_pso", lstm_pso), ("nonpso_cli", nonpso_cli),
-             ("python_exe", python_exe)]:
+for k, v in required_paths.items():
     if not os.path.exists(v):
-        log(f"FATAL: path does not exist [{k}]: {v}")
+        log(f"FATAL: missing [{k}]: {v}")
         sys.exit(2)
 
-# Build the 12-combo plan
+os.makedirs(OUT_ROOT, exist_ok=True)
+
+# Build combo plan
 combos = [(THR_MAIN, s) for s in SEEDS_AT_THR70]
 for thr in THRESHOLDS_AT_S42:
     combos.append((thr, SEED_MAIN))
 
 plan = []
 for thr, s in combos:
-    csv = os.path.join(tables, f"training_thr{thr}_seed{s}.csv")
+    csv = os.path.join(TABLES, f"training_thr{thr}_seed{s}.csv")
     if not os.path.exists(csv):
         log(f"FATAL: missing CSV: {csv}")
         sys.exit(2)
     plan.append((thr, s, csv))
 
 def needs(name, thr, s):
-    d = os.path.join(out_root, name, f"thr{thr}", f"seed{s}")
+    d = os.path.join(OUT_ROOT, name, f"thr{thr}", f"seed{s}")
     return FORCE_RERUN or not os.path.exists(os.path.join(d, "metrics_summary.json"))
 
-# Build task list (only what's not done)
+# Build task list filtered by MODE
 task_list = []
 for ci, (thr, s, csv) in enumerate(plan):
-    if needs("BiLSTM_PSO", thr, s):
-        task_list.append(("pso", thr, s, csv, "BiLSTM_PSO", bilstm_pso))
-    if needs("LSTM_PSO", thr, s):
-        task_list.append(("pso", thr, s, csv, "LSTM_PSO", lstm_pso))
-    if needs("LSTM", thr, s) or needs("BiLSTM", thr, s):
-        which = []
-        if needs("LSTM", thr, s):   which.append("lstm")
-        if needs("BiLSTM", thr, s): which.append("bilstm")
-        task_list.append(("nonpso", thr, s, csv,
-                           "+".join(w.upper() for w in which), nonpso_cli, which))
+    if MODE in ("all", "pso"):
+        if needs("BiLSTM_PSO", thr, s):
+            task_list.append(("pso", thr, s, csv, "BiLSTM_PSO", BILSTM_PSO))
+        if needs("LSTM_PSO", thr, s):
+            task_list.append(("pso", thr, s, csv, "LSTM_PSO", LSTM_PSO))
+    if MODE in ("all", "nonpso"):
+        if needs("LSTM", thr, s) or needs("BiLSTM", thr, s):
+            which = []
+            if needs("LSTM", thr, s):   which.append("lstm")
+            if needs("BiLSTM", thr, s): which.append("bilstm")
+            task_list.append(("nonpso", thr, s, csv,
+                               "+".join(w.upper() for w in which), NONPSO_CLI, which))
 
 n_pso    = sum(1 for t in task_list if t[0] == "pso")
 n_nonpso = sum(1 for t in task_list if t[0] == "nonpso")
+log(f"Plan (mode={MODE}): {len(task_list)} subprocess calls")
+log(f"  PSO subprocess calls:     {n_pso}")
+log(f"  non-PSO subprocess calls: {n_nonpso}")
 
-log(f"Plan: 4 models x {len(plan)} combos = {4*len(plan)} runs total")
-log(f"  PSO remaining:     {n_pso}")
-log(f"  non-PSO remaining: {n_nonpso}")
-log(f"  Already complete:  {len(plan)*4 - n_pso - 2*n_nonpso}")
+def safe_print(prefix, line):
+    try:
+        print(prefix + line.rstrip(), flush=True)
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        safe = line.rstrip().encode("ascii", "replace").decode("ascii")
+        print(prefix + safe, flush=True)
 
 def run_subprocess(cmd, log_path):
-    """Run cmd, stream every stdout line to BOTH our log AND the per-run log."""
     t0 = time.time()
     with open(log_path, "w", encoding="utf-8") as runlog:
         proc = subprocess.Popen(
@@ -160,7 +152,7 @@ def run_subprocess(cmd, log_path):
         )
         for line in proc.stdout:
             runlog.write(line); runlog.flush()
-            print("    " + line.rstrip(), flush=True)
+            safe_print("    ", line)
         proc.wait()
     return proc.returncode, time.time() - t0
 
@@ -176,9 +168,9 @@ for i, entry in enumerate(task_list, 1):
     log("-" * 70)
     if kind == "pso":
         kind, thr, s, csv, name, script = entry
-        od = os.path.join(out_root, name, f"thr{thr}", f"seed{s}")
+        od = os.path.join(OUT_ROOT, name, f"thr{thr}", f"seed{s}")
         os.makedirs(od, exist_ok=True)
-        cmd = [python_exe, script, "--data", csv, "--out_dir", od,
+        cmd = [PYTHON_EXE, script, "--data", csv, "--out_dir", od,
                "--objective", OBJECTIVE, "--grid_km", str(GRID_KM),
                "--pso_particles", str(PSO_PARTICLES),
                "--pso_iters", str(PSO_ITERS), "--pso_folds", str(PSO_FOLDS),
@@ -192,15 +184,15 @@ for i, entry in enumerate(task_list, 1):
             log(f"  >>> {name} thr{thr} s{s}: OK ({dt/60:.1f} min)")
         else:
             fail += 1; fail_logs.append(log_path)
-            log(f"  >>> {name} thr{thr} s{s}: FAIL ({dt/60:.1f} min)  log: {log_path}")
+            log(f"  >>> {name} thr{thr} s{s}: FAIL ({dt/60:.1f} min)")
     else:
         kind, thr, s, csv, name, script, which = entry
-        log_dir = os.path.join(out_root, "__nonpso_logs__", f"thr{thr}_seed{s}")
+        log_dir = os.path.join(OUT_ROOT, "__nonpso_logs__", f"thr{thr}_seed{s}")
         os.makedirs(log_dir, exist_ok=True)
         log_path = os.path.join(log_dir, "run_log.txt")
-        cmd = [python_exe, script,
+        cmd = [PYTHON_EXE, script,
                "--data", csv,
-               "--base_out_dir", out_root,
+               "--base_out_dir", OUT_ROOT,
                "--thr", str(thr), "--seed", str(s),
                "--epochs", str(NONPSO_EPOCHS),
                "--grid_km", str(GRID_KM),
@@ -209,7 +201,7 @@ for i, entry in enumerate(task_list, 1):
         per_ok = 0
         for sub_lower in which:
             sub = "LSTM" if sub_lower == "lstm" else "BiLSTM"
-            msj = os.path.join(out_root, sub, f"thr{thr}", f"seed{s}", "metrics_summary.json")
+            msj = os.path.join(OUT_ROOT, sub, f"thr{thr}", f"seed{s}", "metrics_summary.json")
             if rc == 0 and os.path.exists(msj):
                 per_ok += 1
         if rc == 0 and per_ok == len(which):
@@ -217,15 +209,10 @@ for i, entry in enumerate(task_list, 1):
             log(f"  >>> {name} thr{thr} s{s}: OK ({dt/60:.1f} min)")
         else:
             fail += len(which); fail_logs.append(log_path)
-            log(f"  >>> {name} thr{thr} s{s}: FAIL ({dt/60:.1f} min)  log: {log_path}")
+            log(f"  >>> {name} thr{thr} s{s}: FAIL ({dt/60:.1f} min)")
 
 log("=" * 70)
-log(f"STEP 3 FINISHED in {(time.time()-t_total)/3600:.2f} hours")
+log(f"STEP 3 FINISHED (mode={MODE}) in {(time.time()-t_total)/3600:.2f} hours")
 log(f"  OK:   {ok}")
 log(f"  FAIL: {fail}")
 log("=" * 70)
-if fail_logs:
-    log("Failed run logs:")
-    for lg in fail_logs[:10]:
-        log(f"  {lg}")
-log("Next: STEP 4 (summarize results)")
