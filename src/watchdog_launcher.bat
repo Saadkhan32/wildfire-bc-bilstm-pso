@@ -2,22 +2,28 @@
 REM ============================================================================
 REM watchdog_launcher.bat
 REM
-REM Self-reinvokes with output redirected to a log file in OneDrive, then
-REM loops the headless training script. Restarts within 30 seconds of any
-REM crash. Resume is automatic -- skips combos with existing metrics_summary.
-REM Exits cleanly when all 48 metrics_summary.json files exist.
+REM Self-redirects output to OneDrive log, then loops the headless training.
+REM Sets up wildfire conda env PATH so CUDA DLLs are found (cudart64_110.dll,
+REM cudnn64_8.dll, etc. live in <env>\Library\bin and TF needs them on PATH).
 REM ============================================================================
 
-REM Self-redirect trick: first call lands here, re-invokes self with redirect
+REM Self-redirect: first call re-invokes self with stdout/stderr -> OneDrive log
 if "%1"=="_RUN" goto :MAIN
 "%~f0" _RUN >> "%OneDrive%\wildfire_training.log" 2>&1
 exit /B
 
 :MAIN
 set "REPO=C:\Users\PA Lab\Documents\wildfire-bc-bilstm-pso"
-set "PY=C:\Users\PA Lab\miniconda3\envs\wildfire\python.exe"
+set "CONDA_ENV=C:\Users\PA Lab\miniconda3\envs\wildfire"
+set "PY=%CONDA_ENV%\python.exe"
 set "SCRIPT=%REPO%\src\revision_step3_HEADLESS.py"
 set "RESULTS_DIR=%REPO%\revision_c8c11\05_Model_Results"
+
+REM Prepend conda env paths so CUDA DLLs (cudart64_110, cudnn64_8, etc.) load.
+REM Library\bin is where cudatoolkit + cudnn .dll files live.
+set "PATH=%CONDA_ENV%;%CONDA_ENV%\Library\mingw-w64\bin;%CONDA_ENV%\Library\usr\bin;%CONDA_ENV%\Library\bin;%CONDA_ENV%\Scripts;%CONDA_ENV%\bin;%PATH%"
+set "CONDA_PREFIX=%CONDA_ENV%"
+set "CONDA_DEFAULT_ENV=wildfire"
 
 set /A ATTEMPT=0
 set /A MAX_ATTEMPTS=99
@@ -37,7 +43,6 @@ set "RC=%ERRORLEVEL%"
 echo.
 echo Python exited with code %RC% at %DATE% %TIME%
 
-REM Count completed combos
 set /A DONE=0
 if exist "%RESULTS_DIR%" (
     for /R "%RESULTS_DIR%" %%f in (metrics_summary.json) do set /A DONE+=1
