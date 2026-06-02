@@ -3,16 +3,17 @@
 revision_step3_HEADLESS.py - split-workload production training.
 
 Usage:
-    python src/revision_step3_HEADLESS.py --mode pso       # runs BiLSTM_PSO + LSTM_PSO only
-    python src/revision_step3_HEADLESS.py --mode nonpso    # runs non-PSO LSTM + BiLSTM only
-    python src/revision_step3_HEADLESS.py --mode all       # runs everything (default)
+    python src/revision_step3_HEADLESS.py --mode pso       # BiLSTM_PSO + LSTM_PSO only
+    python src/revision_step3_HEADLESS.py --mode nonpso    # non-PSO LSTM + BiLSTM only
+    python src/revision_step3_HEADLESS.py --mode all       # everything (default)
+    python src/revision_step3_HEADLESS.py --verbose        # show ALL subprocess output
 
-Paths auto-detected from this script's location (no cache file needed).
+By default shows a clean progress bar + only key lines (iter, fold, AUC).
+Full subprocess output always goes to per-run log files.
 Resumable: skips combos with existing metrics_summary.json.
 """
 import os
 import sys
-import json
 import time
 import argparse
 import subprocess
@@ -29,13 +30,24 @@ except Exception:
 # ----- CLI args -----
 ap = argparse.ArgumentParser()
 ap.add_argument("--mode", choices=["all", "pso", "nonpso"], default="all",
-                help="Which models to train: 'pso' (BiLSTM_PSO+LSTM_PSO), 'nonpso' (LSTM+BiLSTM), or 'all'")
-ap.add_argument("--python-exe", default=sys.executable,
-                help="Python interpreter to use for subprocesses (default: current python)")
+                help="Which models to train")
+ap.add_argument("--python-exe", default=sys.executable)
+ap.add_argument("--verbose", action="store_true",
+                help="Stream ALL subprocess output (default: only key lines)")
 args = ap.parse_args()
 
-MODE = args.mode
+MODE       = args.mode
 PYTHON_EXE = args.python_exe
+VERBOSE    = args.verbose
+
+# ----- tqdm with auto-install fallback -----
+try:
+    from tqdm import tqdm
+except ImportError:
+    print("tqdm not found; installing...", flush=True)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "tqdm",
+                            "--quiet", "--disable-pip-version-check"])
+    from tqdm import tqdm
 
 # ----- Auto-detect paths -----
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
@@ -50,8 +62,7 @@ OUT_ROOT    = os.path.join(REPO_ROOT, "revision_c8c11", "05_Model_Results")
 # ----- Design -----
 SEEDS_AT_THR70    = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
 THRESHOLDS_AT_S42 = [100, 200]
-THR_MAIN          = 70
-SEED_MAIN         = 42
+THR_MAIN, SEED_MAIN = 70, 42
 
 # ----- PSO production budget -----
 OBJECTIVE      = "roc"
@@ -65,39 +76,32 @@ RETRAIN_EPOCHS = 30
 NONPSO_EPOCHS  = 30
 FORCE_RERUN    = False
 
-def stamp():
-    return time.strftime("%Y-%m-%d %H:%M:%S")
+def stamp(): return time.strftime("%H:%M:%S")
+def log(msg): print(f"[{stamp()}] {msg}", flush=True)
 
-def log(msg):
-    print(f"[{stamp()}] {msg}", flush=True)
+print("=" * 70, flush=True)
+print(f"STEP 3 PRODUCTION  --  MODE={MODE.upper()}", flush=True)
+print("=" * 70, flush=True)
+print(f"repo       : {REPO_ROOT}", flush=True)
+print(f"out_root   : {OUT_ROOT}", flush=True)
+print(f"python     : {PYTHON_EXE}", flush=True)
+print(f"verbose    : {VERBOSE}", flush=True)
+print(flush=True)
 
-log("=" * 70)
-log(f"STEP 3 PRODUCTION (HEADLESS) -- MODE={MODE}")
-log("=" * 70)
-log(f"repo       = {REPO_ROOT}")
-log(f"tables     = {TABLES}")
-log(f"bilstm_pso = {BILSTM_PSO}")
-log(f"lstm_pso   = {LSTM_PSO}")
-log(f"nonpso_cli = {NONPSO_CLI}")
-log(f"out_root   = {OUT_ROOT}")
-log(f"python     = {PYTHON_EXE}")
-
-# Validate
-required_paths = {"tables": TABLES, "python_exe": PYTHON_EXE}
+# ----- Validate -----
+required = {"tables": TABLES, "python_exe": PYTHON_EXE}
 if MODE in ("all", "pso"):
-    required_paths["bilstm_pso"] = BILSTM_PSO
-    required_paths["lstm_pso"] = LSTM_PSO
+    required["bilstm_pso"] = BILSTM_PSO
+    required["lstm_pso"]   = LSTM_PSO
 if MODE in ("all", "nonpso"):
-    required_paths["nonpso_cli"] = NONPSO_CLI
-
-for k, v in required_paths.items():
+    required["nonpso_cli"] = NONPSO_CLI
+for k, v in required.items():
     if not os.path.exists(v):
-        log(f"FATAL: missing [{k}]: {v}")
-        sys.exit(2)
+        log(f"FATAL: missing [{k}]: {v}"); sys.exit(2)
 
 os.makedirs(OUT_ROOT, exist_ok=True)
 
-# Build combo plan
+# ----- Build combo plan -----
 combos = [(THR_MAIN, s) for s in SEEDS_AT_THR70]
 for thr in THRESHOLDS_AT_S42:
     combos.append((thr, SEED_MAIN))
@@ -106,17 +110,15 @@ plan = []
 for thr, s in combos:
     csv = os.path.join(TABLES, f"training_thr{thr}_seed{s}.csv")
     if not os.path.exists(csv):
-        log(f"FATAL: missing CSV: {csv}")
-        sys.exit(2)
+        log(f"FATAL: missing CSV: {csv}"); sys.exit(2)
     plan.append((thr, s, csv))
 
 def needs(name, thr, s):
     d = os.path.join(OUT_ROOT, name, f"thr{thr}", f"seed{s}")
     return FORCE_RERUN or not os.path.exists(os.path.join(d, "metrics_summary.json"))
 
-# Build task list filtered by MODE
 task_list = []
-for ci, (thr, s, csv) in enumerate(plan):
+for thr, s, csv in plan:
     if MODE in ("all", "pso"):
         if needs("BiLSTM_PSO", thr, s):
             task_list.append(("pso", thr, s, csv, "BiLSTM_PSO", BILSTM_PSO))
@@ -130,11 +132,29 @@ for ci, (thr, s, csv) in enumerate(plan):
             task_list.append(("nonpso", thr, s, csv,
                                "+".join(w.upper() for w in which), NONPSO_CLI, which))
 
-n_pso    = sum(1 for t in task_list if t[0] == "pso")
-n_nonpso = sum(1 for t in task_list if t[0] == "nonpso")
-log(f"Plan (mode={MODE}): {len(task_list)} subprocess calls")
-log(f"  PSO subprocess calls:     {n_pso}")
-log(f"  non-PSO subprocess calls: {n_nonpso}")
+log(f"Plan ({MODE}): {len(task_list)} subprocess calls")
+log(f"  PSO     : {sum(1 for t in task_list if t[0] == 'pso')}")
+log(f"  non-PSO : {sum(1 for t in task_list if t[0] == 'nonpso')}")
+print(flush=True)
+
+# ----- Filter for non-verbose mode: only show "interesting" lines -----
+INTERESTING_KEYWORDS = [
+    "epoch ", "fold ", "Final CV", "particle", "iter", "best loss",
+    "best ROC", "best PR", "best cost", "[CV10]", "[FINAL]", "[BEST]",
+    "[DONE]", "ROC-AUC", "PR-AUC", "Training LSTM", "Training BILSTM",
+    "Training BiLSTM", "SKIP", "ERROR", "Error", "FAIL", "Traceback",
+    "OSError", "RuntimeError", "OOM", "MemoryError"
+]
+NOISE_KEYWORDS = ["tensorflow/core/", "cuda_dnn", "cuda_blas", "cpu_feature_guard",
+                  "Loaded cuDNN", "Created device", "compute capability",
+                  "oneDNN custom", "rebuild TensorFlow", "WARNING:tensorflow",
+                  "tf.compat.v1"]
+
+def is_interesting(line):
+    low = line.lower()
+    if any(n.lower() in low for n in NOISE_KEYWORDS): return False
+    if any(k.lower() in low for k in INTERESTING_KEYWORDS): return True
+    return False
 
 def safe_print(prefix, line):
     try:
@@ -143,7 +163,8 @@ def safe_print(prefix, line):
         safe = line.rstrip().encode("ascii", "replace").decode("ascii")
         print(prefix + safe, flush=True)
 
-def run_subprocess(cmd, log_path):
+def run_subprocess(cmd, log_path, label):
+    """Stream stdout: full to log_path, filtered to console (unless --verbose)."""
     t0 = time.time()
     with open(log_path, "w", encoding="utf-8") as runlog:
         proc = subprocess.Popen(
@@ -152,20 +173,28 @@ def run_subprocess(cmd, log_path):
         )
         for line in proc.stdout:
             runlog.write(line); runlog.flush()
-            safe_print("    ", line)
+            if VERBOSE or is_interesting(line):
+                safe_print(f"  [{label}] ", line)
         proc.wait()
     return proc.returncode, time.time() - t0
 
+# ----- Run with progress bar -----
 t_total = time.time()
-ok = 0
-fail = 0
+ok = fail = 0
 fail_logs = []
+
+pbar = tqdm(total=len(task_list), desc=f"STEP 3 ({MODE})",
+            unit="combo",
+            bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]{postfix}")
 
 for i, entry in enumerate(task_list, 1):
     kind = entry[0]
-    log("-" * 70)
-    log(f"[{i:>3}/{len(task_list)}]  {entry[4]}  thr{entry[1]}  seed{entry[2]}")
-    log("-" * 70)
+    label_short = f"{entry[4]} thr{entry[1]} s{entry[2]}"
+    pbar.set_postfix_str(label_short)
+    print(f"\n{'=' * 70}", flush=True)
+    print(f"[{i:>3}/{len(task_list)}] {label_short}", flush=True)
+    print(f"{'=' * 70}", flush=True)
+
     if kind == "pso":
         kind, thr, s, csv, name, script = entry
         od = os.path.join(OUT_ROOT, name, f"thr{thr}", f"seed{s}")
@@ -178,41 +207,65 @@ for i, entry in enumerate(task_list, 1):
                "--retrain_epochs", str(RETRAIN_EPOCHS),
                "--progress", PROGRESS]
         log_path = os.path.join(od, "run_log.txt")
-        rc, dt = run_subprocess(cmd, log_path)
+        rc, dt = run_subprocess(cmd, log_path, name)
         if rc == 0 and os.path.exists(os.path.join(od, "metrics_summary.json")):
             ok += 1
-            log(f"  >>> {name} thr{thr} s{s}: OK ({dt/60:.1f} min)")
+            msj_path = os.path.join(od, "metrics_summary.json")
+            try:
+                import json
+                with open(msj_path, "r", encoding="utf-8") as f:
+                    msj = json.load(f)
+                roc = msj.get("cv_oof", {}).get("roc_auc", float("nan"))
+                pr  = msj.get("cv_oof", {}).get("pr_auc",  float("nan"))
+                print(f"\n  >>> {label_short}: OK ({dt/60:.1f} min)  cv_oof ROC={roc:.4f}  PR={pr:.4f}\n", flush=True)
+            except Exception:
+                print(f"\n  >>> {label_short}: OK ({dt/60:.1f} min)\n", flush=True)
         else:
             fail += 1; fail_logs.append(log_path)
-            log(f"  >>> {name} thr{thr} s{s}: FAIL ({dt/60:.1f} min)")
+            print(f"\n  >>> {label_short}: FAIL ({dt/60:.1f} min)  log: {log_path}\n", flush=True)
     else:
         kind, thr, s, csv, name, script, which = entry
         log_dir = os.path.join(OUT_ROOT, "__nonpso_logs__", f"thr{thr}_seed{s}")
         os.makedirs(log_dir, exist_ok=True)
         log_path = os.path.join(log_dir, "run_log.txt")
         cmd = [PYTHON_EXE, script,
-               "--data", csv,
-               "--base_out_dir", OUT_ROOT,
+               "--data", csv, "--base_out_dir", OUT_ROOT,
                "--thr", str(thr), "--seed", str(s),
                "--epochs", str(NONPSO_EPOCHS),
                "--grid_km", str(GRID_KM),
                "--models", ",".join(which)]
-        rc, dt = run_subprocess(cmd, log_path)
+        rc, dt = run_subprocess(cmd, log_path, label_short)
         per_ok = 0
         for sub_lower in which:
             sub = "LSTM" if sub_lower == "lstm" else "BiLSTM"
             msj = os.path.join(OUT_ROOT, sub, f"thr{thr}", f"seed{s}", "metrics_summary.json")
             if rc == 0 and os.path.exists(msj):
                 per_ok += 1
+                try:
+                    import json
+                    with open(msj, "r", encoding="utf-8") as f:
+                        d = json.load(f)
+                    roc = d.get("cv_oof", {}).get("roc_auc", float("nan"))
+                    pr  = d.get("cv_oof", {}).get("pr_auc",  float("nan"))
+                    print(f"  >>> {sub} thr{thr} s{s}: OK   cv_oof ROC={roc:.4f}  PR={pr:.4f}", flush=True)
+                except Exception: pass
         if rc == 0 and per_ok == len(which):
             ok += len(which)
-            log(f"  >>> {name} thr{thr} s{s}: OK ({dt/60:.1f} min)")
+            print(f"\n  >>> {label_short}: OK ({dt/60:.1f} min)\n", flush=True)
         else:
             fail += len(which); fail_logs.append(log_path)
-            log(f"  >>> {name} thr{thr} s{s}: FAIL ({dt/60:.1f} min)")
+            print(f"\n  >>> {label_short}: FAIL ({dt/60:.1f} min)  log: {log_path}\n", flush=True)
 
-log("=" * 70)
-log(f"STEP 3 FINISHED (mode={MODE}) in {(time.time()-t_total)/3600:.2f} hours")
-log(f"  OK:   {ok}")
-log(f"  FAIL: {fail}")
-log("=" * 70)
+    pbar.update(1)
+
+pbar.close()
+
+print("\n" + "=" * 70, flush=True)
+print(f"STEP 3 FINISHED (mode={MODE}) in {(time.time()-t_total)/3600:.2f} hours", flush=True)
+print(f"  OK:   {ok}", flush=True)
+print(f"  FAIL: {fail}", flush=True)
+print("=" * 70, flush=True)
+if fail_logs:
+    print("\nFailed run logs:", flush=True)
+    for lg in fail_logs[:10]:
+        print(f"  {lg}", flush=True)
