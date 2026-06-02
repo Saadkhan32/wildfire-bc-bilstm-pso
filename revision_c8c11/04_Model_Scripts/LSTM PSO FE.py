@@ -135,7 +135,20 @@ def prepare_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str], Optiona
     lon_col = next((c for c in work.columns if c.lower() in ["longitude", "lon", "lng"]), None)
 
     # Choose features (exclude Status/lat/lon)
-    candidates = [c for c in work.columns if c not in ["Status", lat_col, lon_col]]
+    # Exclude target, coordinates, and ID-like columns to prevent leakage.
+    # CRITICAL: row identifiers (UniqueID, OBJECTID, FID, etc.) trivially separate
+    # wildfire rows (generated first) from pseudo-absence rows (generated later),
+    # producing near-perfect AUCs that DO NOT reflect ecological signal.
+    ID_COLS = {"UniqueID", "Unique_ID", "unique_id",
+               "OBJECTID", "ObjectID", "objectid", "object_id",
+               "FID", "Fid", "fid",
+               "OID", "Oid", "oid",
+               "pointid", "PointID", "point_id", "POINT_ID",
+               "CID", "CID_", "Cid", "cid",
+               "ID", "Id", "id",
+               "index", "Index", "INDEX", "row_id", "RowID"}
+    excluded = {"Status", lat_col, lon_col} | ID_COLS
+    candidates = [c for c in work.columns if c not in excluded]
     cat_like = {"lulc", "landuse", "land_cover", "landcover"}
     cat_cols = []
     for c in candidates:
