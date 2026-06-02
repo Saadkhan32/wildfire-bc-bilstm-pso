@@ -1,0 +1,108 @@
+{
+  "comment_addressed": "Reviewer Comment 8 — sample-number justification",
+  "generated": "2026-06-01",
+  "manuscript_reference": "ECOINF-D-26-01275 R1 v8",
+  "purpose": "Reconcile sample-size counts that appear throughout the manuscript and analysis tables.",
+  "lineage": [
+    {
+      "step": 1,
+      "label": "raw_cwfis_2000_2024",
+      "n": null,
+      "source": "Canadian Wildland Fire Information System (CWFIS) National Fire Database (NFDB) perimeters, 2000-2024",
+      "note": "Full national perimeter shapefile; n not recorded in repo (~110 MB raw, excluded from git per GitHub size limit; available via Zenodo deposit 10.5281/zenodo.20389084)."
+    },
+    {
+      "step": 2,
+      "label": "filter_intersects_bc_bbox_and_2000_2024",
+      "n": null,
+      "filter": "YEAR in [2000, 2024] AND LATITUDE in [48.30, 60.00] AND LONGITUDE in [-139.06, -114.03]",
+      "source": "src/day2_automation.py Phase D, lines 286-298",
+      "note": "Bounding-box catches BC + Parks Canada (PC) + edge fires in YT/NT/AB inside the BC bbox; intermediate count not stored as a separate artifact."
+    },
+    {
+      "step": 3,
+      "label": "filter_area_geq_70ha",
+      "n": 2034,
+      "filter": "AREA_HA >= 70",
+      "source": "data/processed/fires_geq_70ha.shp (DBF feature count = 2,034)",
+      "src_agency_breakdown": {"BC": 1992, "PC": 35, "YT": 6, "NT": 1},
+      "year_range": "2000-2024 (25 years)",
+      "note": "This is the n reported in tables/T_sensitivity_threshold.csv at the 70 ha baseline, and in tables/T_morans_per_threshold.csv where threshold_ha = 70."
+    },
+    {
+      "step": 4,
+      "label": "filter_src_agency_bc_only_2000_2024",
+      "n": 1992,
+      "filter": "SRC_AGENCY = 'BC' AND YEAR in [2000, 2024]",
+      "source": "Derived (2034 - 35 PC - 6 YT - 1 NT)",
+      "note": "Drops 42 non-BC-agency fires that fell inside the BC bounding box (Parks Canada + Yukon Territory + Northwest Territories). This is the MODELLING fire set: the BiLSTM-PSO classifier was trained on these 1,992 fires."
+    },
+    {
+      "step": 5,
+      "label": "final_modelling_fire_set",
+      "n": 1992,
+      "year_range": "2000-2024 (25 years)",
+      "source": "Filter SRC_AGENCY='BC' applied to fires_geq_70ha.shp (n=2,034)",
+      "predictor_count_raw": 18,
+      "predictor_count_after_rfe": 15,
+      "rfe_dropped": "3 predictors removed by Recursive Feature Elimination (variables flagged as low-importance in §2.12 of manuscript)",
+      "note": "Full 2000-2024 BC-agency fire pool used to train the BiLSTM-PSO model."
+    },
+    {
+      "step": 6,
+      "label": "nonfire_pseudo_absence_pool",
+      "n": 1359,
+      "source": "Derived: total_OOF_predictions - n_fire = 3351 - 1992 = 1359",
+      "sampling_seed": 42,
+      "sampling_seed_source": "src/seeds.py key 'nonfire_sampling'",
+      "ratio_fire_to_nonfire": "1.47 : 1 (fire-dominant)",
+      "note": "Pseudo-absence points sampled from BC non-burned area. The fire:non-fire ratio is 1.47:1 rather than 1:1, which is unusual for binary classification; the manuscript should document the rationale (e.g. focusing on positive-class learning, or constrained by non-fire area availability). Sampling rule not yet documented in repo; needs to be added to manuscript Methods."
+    },
+    {
+      "step": 7,
+      "label": "total_training_pool",
+      "n": 3351,
+      "source": "1,992 fires + 1,359 non-fire = 3,351 labelled points",
+      "class_balance": {"fire": 1992, "non_fire": 1359, "fire_fraction": 0.594, "non_fire_fraction": 0.406},
+      "note": "Full pool entering the 10-fold spatial-block CV. Class balance is mildly fire-dominant."
+    },
+    {
+      "step": 9,
+      "label": "cv_oof_predictions",
+      "n": 3351,
+      "source": "G:\\Deep learning for wildfire susceptibility mapping\\...\\cv_oof_predictions.csv (read by src/phase_b_bootstrap_ci.py)",
+      "design": "10-fold spatial-block cross-validation; each point's prediction comes from the fold in which it was held out.",
+      "cv_seed": 7,
+      "cv_seed_source": "src/seeds.py key 'kfold'",
+      "note": "Reported as 'n=3,351' in tables/T_metrics_bootstrap.csv and in commit e22fe83 message."
+    },
+    {
+      "step": 10,
+      "label": "bootstrap_resamples",
+      "n_resamples": 1000,
+      "n_per_resample": 3351,
+      "source": "src/phase_b_bootstrap_ci.py (N_BOOT = 1000, rng = np.random.default_rng(42))",
+      "bootstrap_seed": 42,
+      "bootstrap_seed_source": "Inline default_rng(42) in phase_b_bootstrap_ci.py — NOT yet centralised in src/seeds.py; should be added as a sixth seed key.",
+      "ci_method": "Percentile bootstrap (2.5%, 97.5%) on n_resamples = 1,000"
+    }
+  ],
+  "summary_for_manuscript": {
+    "headline_n_for_modelling": 1992,
+    "headline_n_for_oof_metrics": 3351,
+    "headline_n_for_threshold_sensitivity": {"50_ha": 2297, "70_ha": 2034, "100_ha": 1802},
+    "agency_filter": "SRC_AGENCY = 'BC'",
+    "year_window_modelling": "2000-2024",
+    "year_window_threshold_sensitivity": "2000-2024",
+    "discrepancy_note": "The threshold-sensitivity analysis (tables/T_morans_per_threshold.csv) uses the BC bbox + all agencies population (BC + PC + YT + NT, n=2,034) to test whether the threshold choice itself affects spatial signal. The modelling set is the SRC_AGENCY='BC' subset of that pool (n=1,992) trained on the full 2000-2024 window. The current spatial-autocorrelation analysis outputs (T_autocorrelation_global.csv, T_gearys_c.csv) are computed on the older fire_centroids_70ha.shp subset (n=1,839, missing 153 fires from 2024) and should be re-run on the 1,992 modelling set for consistency before final submission."
+  },
+  "open_items_for_manuscript_text": [
+    "State explicitly that the modelling fire set n=1,992 is the SRC_AGENCY='BC' subset of the n=2,034 large-fire pool, trained on 2000-2024.",
+    "State explicitly that 42 non-BC-agency fires (35 PC + 6 YT + 1 NT) inside the BC bounding box were excluded to keep training labels jurisdictionally consistent.",
+    "Document the pseudo-absence sampling rule (where in BC, what minimum distance from any burned polygon, what density target) — currently only the seed (42) is in src/seeds.py.",
+    "Justify the 1.47:1 fire-to-non-fire class ratio (1,992 fire : 1,359 non-fire) or note the rationale (presence-rich learning, constrained non-fire area, etc.).",
+    "Move the bootstrap seed (currently inline 42 in phase_b_bootstrap_ci.py) into src/seeds.py as a sixth named key for consistency.",
+    "Re-run spatial autocorrelation (Moran's I, Geary's C, LISA, Gi*) on the 1,992-fire modelling set so the §2.7 results are model-consistent rather than computed on the older 1,839 subset.",
+    "Update commit e22fe83 message reference in §3.3 from 'n=3,351 from paper's 10-fold CV' citing 1,839 as the BC-fire count, to the corrected 1,992."
+  ]
+}

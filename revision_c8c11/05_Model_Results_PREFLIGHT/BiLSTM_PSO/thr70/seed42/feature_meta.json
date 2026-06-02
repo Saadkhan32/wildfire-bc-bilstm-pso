@@ -1,0 +1,27 @@
+{
+  "used_cols": [
+    "UniqueID",
+    "Slope",
+    "Elevation",
+    "TWI",
+    "Profile_Curvature",
+    "Plan_Curvature",
+    "NDVI",
+    "LULC",
+    "Max_Temperature",
+    "Precipitation",
+    "WS",
+    "Relative_Humidity",
+    "AET",
+    "DSI",
+    "Soil_Moisture",
+    "Distance_roads",
+    "Distance_rivers",
+    "Distance_households",
+    "Aspect_sin",
+    "Aspect_cos"
+  ],
+  "lat_col": "Latitude",
+  "lon_col": "Longitude",
+  "grid_km": 50.0
+}

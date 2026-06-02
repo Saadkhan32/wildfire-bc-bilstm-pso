@@ -1,0 +1,24 @@
+{
+  "started": "2026-05-31T04:35:30.486314",
+  "project_root": "C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso",
+  "phase_d": {
+    "status": "skipped"
+  },
+  "phase_e": {
+    "status": "ok",
+    "ols_slope": 46786.613391304345,
+    "ols_p": 0.010175133181992842,
+    "ts_slope": 9341.748857142858,
+    "mk_p": 0.021065443548514473,
+    "mk_trend": "increasing",
+    "csv": "C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso\\tables\\T_fig5a_trend_methods.csv",
+    "fig": "C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso\\figs\\Fig5a_theilsen_revised.png"
+  },
+  "phase_f": {
+    "status": "skipped"
+  },
+  "phase_g": {
+    "status": "skipped"
+  },
+  "ended": "2026-05-31T04:36:40.970884"
+}

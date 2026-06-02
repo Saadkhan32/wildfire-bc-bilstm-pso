@@ -1,0 +1,74 @@
+2026-06-01 23:31:01.466840: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING:tensorflow:From C:\Users\saadz\anaconda3\envs\wildfire\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+[PSO] objective=ROC  particles=2  iters=1  folds=2  epochs=3  rfe_fraction=0.6
+2026-06-01 23:31:05,973 - pyswarms.single.global_best - INFO - Optimize for 1 iters with {'c1': 1.5, 'c2': 1.5, 'w': 0.7}
+
+pyswarms.single.global_best:   0%|          |0/1
+
+PSO particle evals:   0%|          | 0/2 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A2026-06-01 23:31:10.614149: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE SSE2 SSE3 SSE4.1 SSE4.2 AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:From C:\Users\saadz\anaconda3\envs\wildfire\lib\site-packages\keras\src\backend.py:1398: The name tf.executing_eagerly_outside_functions is deprecated. Please use tf.compat.v1.executing_eagerly_outside_functions instead.
+
+2026-06-01 23:31:10,750 - tensorflow - WARNING - From C:\Users\saadz\anaconda3\envs\wildfire\lib\site-packages\keras\src\backend.py:1398: The name tf.executing_eagerly_outside_functions is deprecated. Please use tf.compat.v1.executing_eagerly_outside_functions instead.
+
+WARNING:tensorflow:From C:\Users\saadz\anaconda3\envs\wildfire\lib\site-packages\keras\src\utils\tf_utils.py:492: The name tf.ragged.RaggedTensorValue is deprecated. Please use tf.compat.v1.ragged.RaggedTensorValue instead.
+
+2026-06-01 23:31:11,682 - tensorflow - WARNING - From C:\Users\saadz\anaconda3\envs\wildfire\lib\site-packages\keras\src\utils\tf_utils.py:492: The name tf.ragged.RaggedTensorValue is deprecated. Please use tf.compat.v1.ragged.RaggedTensorValue instead.
+
+
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:14<00:14, 14.25s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:28<00:00, 14.00s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 1/2 [00:28<00:28, 28.07s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.25s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.35s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 2/2 [01:02<00:00, 31.96s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:   0%|          |0/1, best_cost=0.000734
+pyswarms.single.global_best: 100%|██████████|1/1, best_cost=0.000734
+pyswarms.single.global_best: 100%|██████████|1/1, best_cost=0.000734
+2026-06-01 23:32:08,728 - pyswarms.single.global_best - INFO - Optimization finished | best cost: 0.0007344266670170629, best pos: [-3.31824922e+00  3.12301801e-04  3.49109809e-01  2.32120650e-01
+  2.74796796e+02  1.17999902e+02  5.17698500e+00  3.18393145e+01
+  3.09045458e+00  9.87995496e-03]
+[PSO] best loss=0.000734  best ROC=0.999266  time=1.0 min
+[BEST] params: {'lr': 0.0004805634941249136, 'weight_decay': 0.0003123018011108347, 'dropout': 0.349109809481554, 'sdrop': 0.2321206495727003, 'units1': 288, 'units2': 128, 'batch': 32, 'conv_filters': 32, 'kernel_size': 3, 'label_smoothing': 0.009879954961448965}
+
+Final CV (10 folds):   0%|          | 0/10 [00:00<?, ?it/s]
+Final CV (10 folds):  10%|█         | 1/10 [00:18<02:48, 18.68s/it]
+Final CV (10 folds):  20%|██        | 2/10 [00:37<02:30, 18.85s/it]
+Final CV (10 folds):  30%|███       | 3/10 [00:56<02:12, 18.94s/it]
+Final CV (10 folds):  40%|████      | 4/10 [01:15<01:52, 18.78s/it]
+Final CV (10 folds):  50%|█████     | 5/10 [01:34<01:34, 18.92s/it]
+Final CV (10 folds):  60%|██████    | 6/10 [01:53<01:15, 18.88s/it]
+Final CV (10 folds):  70%|███████   | 7/10 [02:12<00:57, 19.16s/it]
+Final CV (10 folds):  80%|████████  | 8/10 [02:37<00:41, 20.75s/it]
+Final CV (10 folds):  90%|█████████ | 9/10 [02:58<00:21, 21.04s/it]
+Final CV (10 folds): 100%|██████████| 10/10 [03:17<00:00, 20.45s/it]
+Final CV (10 folds): 100%|██████████| 10/10 [03:17<00:00, 19.79s/it]
+[CV10] mean PR-AUC=0.9994  ROC-AUC=0.9994
+[CV10] COMBINED (OOF) PR-AUC=0.9995  ROC-AUC=0.9995
+[FINAL] holdout PR-AUC=0.9993  ROC-AUC=0.9993
+[DONE] Saved: best_params.json, cv_metrics_10fold.csv, cv_oof_predictions.csv, metrics_summary.json, final_model.keras, predictions_allrows.csv, static_preprocessor.joblib, selected_features_final.csv, feature_meta.json
