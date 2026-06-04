@@ -68,3 +68,6 @@ data/vectors_bcalbers/NFDB_poly_large.*
 revision_c8c11/05_Model_Results/**/*.keras
 revision_c8c11/05_Model_Results/**/*.h5
 revision_c8c11/05_Model_Results/**/static_preprocessor.joblib
+
+# Phase E1: BC susceptibility outputs (allowed despite *.tif exclusion above)
+!revision_c8c11/02_GIS_Output/BC_susceptibility_*.tif
