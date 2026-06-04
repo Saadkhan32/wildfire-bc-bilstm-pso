@@ -26,6 +26,10 @@ Write-Host "=== Verify TF + SHAP + helper deps ===" -ForegroundColor Cyan
 $shapCheck = & $PY -c "import shap; print('SHAP', shap.__version__)" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "  shap import failed. Installing shap + lightweight deps..." -ForegroundColor Yellow
+    # numba needs llvmlite (a compiled binding); install with deps so pip resolves the
+    # exact compatible llvmlite version. Other shap deps stay --no-deps to avoid
+    # clobbering the env's scipy/sklearn.
+    & $PY -m pip install llvmlite --quiet
     & $PY -m pip install shap slicer cloudpickle numba tqdm packaging --no-deps --quiet
     $shapCheck = & $PY -c "import shap; print('SHAP', shap.__version__)" 2>&1
     if ($LASTEXITCODE -ne 0) {
