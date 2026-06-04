@@ -63,3 +63,8 @@ __pycache__/
 # NFDB national wildfire database (110MB .dbf, exceeds GitHub 100MB limit)
 # Re-downloadable from CWFIS via src/day2_automation.py; full archive on Zenodo (Day 11).
 data/vectors_bcalbers/NFDB_poly_large.*
+
+# Sensitivity-grid trained models (heavy, transferred separately)
+revision_c8c11/05_Model_Results/**/*.keras
+revision_c8c11/05_Model_Results/**/*.h5
+revision_c8c11/05_Model_Results/**/static_preprocessor.joblib

@@ -1,0 +1,572 @@
+[PSO] objective=ROC  particles=6  iters=6  folds=2  epochs=30  rfe_fraction=0.6
+2026-06-03 18:46:19,039 - pyswarms.single.global_best - INFO - Optimize for 6 iters with {'c1': 1.5, 'c2': 1.5, 'w': 0.7}
+
+pyswarms.single.global_best:   0%|          |0/6
+
+PSO particle evals:   0%|          | 0/6 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A2026-06-03 18:46:24.420714: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-06-03 18:46:24.990309: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 5416 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 4070 Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.9
+2026-06-03 18:46:27.603023: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+2026-06-03 18:46:29.146720: I tensorflow/stream_executor/cuda/cuda_blas.cc:1614] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.04s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:31<00:00, 15.36s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  17%|█▋        | 1/6 [00:31<02:36, 31.22s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:18<00:18, 18.43s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 17.91s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  33%|███▎      | 2/6 [01:07<02:16, 34.02s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:14<00:14, 14.71s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:28<00:00, 14.00s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 3/6 [01:35<01:34, 31.37s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.68s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 17.62s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  67%|██████▋   | 4/6 [02:10<01:05, 32.91s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.85s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 17.68s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  83%|████████▎ | 5/6 [02:46<00:33, 33.81s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:16<00:16, 16.74s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:33<00:00, 16.64s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 6/6 [03:19<00:00, 33.64s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:   0%|          |0/6, best_cost=0.118
+pyswarms.single.global_best:  17%|█▋        |1/6, best_cost=0.118
+
+PSO particle evals:   0%|          | 0/6 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:16<00:16, 16.22s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 18.12s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  17%|█▋        | 1/6 [00:35<02:58, 35.67s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.35s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:26<00:00, 13.27s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  33%|███▎      | 2/6 [01:02<02:01, 30.31s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.78s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.06s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 3/6 [01:36<01:36, 32.14s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.75s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.64s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  67%|██████▋   | 4/6 [02:03<01:00, 30.24s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:26<00:26, 26.54s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:51<00:00, 25.45s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  83%|████████▎ | 5/6 [02:55<00:37, 37.81s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.46s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.51s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 6/6 [03:22<00:00, 34.14s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:  17%|█▋        |1/6, best_cost=0.118
+pyswarms.single.global_best:  33%|███▎      |2/6, best_cost=0.118
+
+PSO particle evals:   0%|          | 0/6 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:18<00:18, 18.09s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 17.54s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  17%|█▋        | 1/6 [00:35<02:56, 35.25s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.67s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.02s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  33%|███▎      | 2/6 [01:09<02:18, 34.65s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:14<00:14, 14.97s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:28<00:00, 14.15s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 3/6 [01:38<01:35, 31.87s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:16<00:16, 16.66s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.20s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  67%|██████▋   | 4/6 [02:12<01:05, 32.81s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.83s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.71s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  83%|████████▎ | 5/6 [02:39<00:30, 30.88s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.98s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.72s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 6/6 [03:07<00:00, 29.74s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:  33%|███▎      |2/6, best_cost=0.118
+pyswarms.single.global_best:  50%|█████     |3/6, best_cost=0.118
+
+PSO particle evals:   0%|          | 0/6 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.71s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.56s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  17%|█▋        | 1/6 [00:27<02:15, 27.17s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.99s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 17.88s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  33%|███▎      | 2/6 [01:02<02:08, 32.24s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:14<00:14, 14.88s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:29<00:00, 15.02s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 3/6 [01:32<01:33, 31.21s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:18<00:18, 18.31s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:35<00:00, 17.72s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  67%|██████▋   | 4/6 [02:08<01:05, 32.95s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.20s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:26<00:00, 13.41s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  83%|████████▎ | 5/6 [02:35<00:30, 30.72s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.86s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.14s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 6/6 [03:09<00:00, 32.00s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:  50%|█████     |3/6, best_cost=0.118
+pyswarms.single.global_best:  67%|██████▋   |4/6, best_cost=0.118
+
+PSO particle evals:   0%|          | 0/6 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.80s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:24<00:00, 12.03s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  17%|█▋        | 1/6 [00:24<02:02, 24.59s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.67s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 16.94s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  33%|███▎      | 2/6 [00:58<02:00, 30.18s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.40s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:33<00:00, 16.67s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 3/6 [01:32<01:35, 31.73s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 18.00s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.21s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  67%|██████▋   | 4/6 [02:06<01:05, 32.89s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:25<00:25, 25.02s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:45<00:00, 22.47s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  83%|████████▎ | 5/6 [02:52<00:37, 37.51s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:16<00:16, 16.66s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.30s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 6/6 [03:27<00:00, 36.46s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:  67%|██████▋   |4/6, best_cost=0.118
+pyswarms.single.global_best:  83%|████████▎ |5/6, best_cost=0.118
+
+PSO particle evals:   0%|          | 0/6 [00:00<?, ?it/s][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:18<00:18, 18.21s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:36<00:00, 18.14s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  17%|█▋        | 1/6 [00:36<03:01, 36.30s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:14<00:14, 14.15s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.91s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  33%|███▎      | 2/6 [01:04<02:05, 31.35s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:11<00:11, 11.73s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:23<00:00, 11.66s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  50%|█████     | 3/6 [01:27<01:23, 27.69s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:17<00:17, 17.93s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:34<00:00, 17.16s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  67%|██████▋   | 4/6 [02:02<01:00, 30.40s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.70s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:27<00:00, 13.68s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals:  83%|████████▎ | 5/6 [02:29<00:29, 29.31s/it][A
+
+
+PSO CV folds:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+
+PSO CV folds:  50%|█████     | 1/2 [00:13<00:13, 13.35s/it][A[A
+
+
+PSO CV folds: 100%|██████████| 2/2 [00:26<00:00, 13.25s/it][A[A
+
+
+                                                           [A[A
+
+PSO particle evals: 100%|██████████| 6/6 [02:55<00:00, 28.36s/it][A
+
+                                                                 [A
+pyswarms.single.global_best:  83%|████████▎ |5/6, best_cost=0.118
+pyswarms.single.global_best: 100%|██████████|6/6, best_cost=0.118
+pyswarms.single.global_best: 100%|██████████|6/6, best_cost=0.118
+2026-06-03 19:05:40,662 - pyswarms.single.global_best - INFO - Optimization finished | best cost: 0.1178808504188642, best pos: [-3.49346138e+00  1.64692533e-05  2.72176750e-01  1.18504282e-01
+  2.83873176e+02  2.23189029e+01  6.38187548e+00  3.94694139e+01
+  4.87345998e+00  7.06281416e-03]
+[PSO] best loss=0.117881  best ROC=0.882119  time=19.4 min
+[BEST] params: {'lr': 0.0003210248244133042, 'weight_decay': 1.64692532818639e-05, 'dropout': 0.2721767504938706, 'sdrop': 0.11850428178364944, 'units1': 288, 'units2': 32, 'batch': 64, 'conv_filters': 40, 'kernel_size': 5, 'label_smoothing': 0.007062814162189899}
+
+Final CV (10 folds):   0%|          | 0/10 [00:00<?, ?it/s]
+Final CV (10 folds):  10%|█         | 1/10 [00:18<02:43, 18.15s/it]
+Final CV (10 folds):  20%|██        | 2/10 [00:39<02:42, 20.30s/it]
+Final CV (10 folds):  30%|███       | 3/10 [00:57<02:14, 19.24s/it]
+Final CV (10 folds):  40%|████      | 4/10 [01:18<01:59, 19.90s/it]
+Final CV (10 folds):  50%|█████     | 5/10 [01:38<01:39, 19.88s/it]
+Final CV (10 folds):  60%|██████    | 6/10 [01:58<01:19, 19.89s/it]
+Final CV (10 folds):  70%|███████   | 7/10 [02:19<01:01, 20.34s/it]
+Final CV (10 folds):  80%|████████  | 8/10 [02:36<00:38, 19.20s/it]
+Final CV (10 folds):  90%|█████████ | 9/10 [02:58<00:19, 19.98s/it]
+Final CV (10 folds): 100%|██████████| 10/10 [03:20<00:00, 20.70s/it]
+Final CV (10 folds): 100%|██████████| 10/10 [03:20<00:00, 20.06s/it]
+[CV10] mean PR-AUC=0.8780  ROC-AUC=0.8923
+[CV10] COMBINED (OOF) PR-AUC=0.8746  ROC-AUC=0.8894
+[FINAL] holdout PR-AUC=0.9027  ROC-AUC=0.9066
+[DONE] Saved: best_params.json, cv_metrics_10fold.csv, cv_oof_predictions.csv, metrics_summary.json, final_model.keras, predictions_allrows.csv, static_preprocessor.joblib, selected_features_final.csv, feature_meta.json

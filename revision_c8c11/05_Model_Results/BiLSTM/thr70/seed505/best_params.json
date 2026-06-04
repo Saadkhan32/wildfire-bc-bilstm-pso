@@ -1,0 +1,15 @@
+{
+  "hps": {
+    "units": 320,
+    "layers_n": 2,
+    "dropout": 0.22,
+    "recurrent_drop": 0.12,
+    "spatial_drop": 0.12,
+    "l2": 2e-06,
+    "lr": 0.0003,
+    "batch_size": 64,
+    "label_smooth": 0.01,
+    "bidirectional": true
+  },
+  "note": "non-PSO baseline, fixed hyperparameters"
+}

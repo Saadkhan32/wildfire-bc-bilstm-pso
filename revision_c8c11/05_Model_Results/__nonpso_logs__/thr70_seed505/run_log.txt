@@ -1,0 +1,31 @@
+[non-PSO CLI] data: C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\revision_c8c11\03_Training_Tables\training_thr70_seed505.csv
+[non-PSO CLI] thr=70  seed=505  epochs=30
+[non-PSO CLI] rows=3984  fire=1992  nonfire=1992  unique groups=457
+
+  Training LSTM (30 epochs x 10 folds) ...
+    fold  1/10  pr_auc=0.8930  roc_auc=0.8882
+    fold  2/10  pr_auc=0.7850  roc_auc=0.8312
+    fold  3/10  pr_auc=0.8451  roc_auc=0.8542
+    fold  4/10  pr_auc=0.8180  roc_auc=0.8236
+    fold  5/10  pr_auc=0.8725  roc_auc=0.8206
+    fold  6/10  pr_auc=0.8150  roc_auc=0.8435
+    fold  7/10  pr_auc=0.8861  roc_auc=0.8169
+    fold  8/10  pr_auc=0.8772  roc_auc=0.8634
+    fold  9/10  pr_auc=0.8627  roc_auc=0.8726
+    fold 10/10  pr_auc=0.8409  roc_auc=0.8727
+  LSTM cv_oof_roc=0.8486  cv_oof_pr=0.8474
+
+  Training BiLSTM (30 epochs x 10 folds) ...
+    fold  1/10  pr_auc=0.8960  roc_auc=0.9004
+    fold  2/10  pr_auc=0.8269  roc_auc=0.8735
+    fold  3/10  pr_auc=0.8432  roc_auc=0.8666
+    fold  4/10  pr_auc=0.8398  roc_auc=0.8604
+    fold  5/10  pr_auc=0.8927  roc_auc=0.8602
+    fold  6/10  pr_auc=0.8603  roc_auc=0.8825
+    fold  7/10  pr_auc=0.8996  roc_auc=0.8437
+    fold  8/10  pr_auc=0.8593  roc_auc=0.8610
+    fold  9/10  pr_auc=0.8566  roc_auc=0.8705
+    fold 10/10  pr_auc=0.8702  roc_auc=0.8917
+  BiLSTM cv_oof_roc=0.8681  cv_oof_pr=0.8614
+
+[non-PSO CLI] done.
