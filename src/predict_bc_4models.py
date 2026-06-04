@@ -27,6 +27,7 @@ import pandas as pd
 import joblib
 import rasterio
 from rasterio.windows import Window
+from rasterio.warp import reproject, Resampling
 
 # tqdm with auto-install fallback (same pattern as the headless trainer)
 try:
@@ -50,15 +51,13 @@ from tensorflow import keras
 from tensorflow.keras import layers
 print(f"TF {tf.__version__}")
 
-# If any GPU is visible AND it's a DirectML pluggable device, hide it.
-# This prevents the CudnnRNN-not-supported crash during LSTM prediction.
+# Hide GPUs whenever FORCE_CPU=1 (DirectML / AMD inference can't run CudnnRNN).
+# CUDA_VISIBLE_DEVICES=-1 only blocks CUDA, not DirectML pluggable devices, so
+# we must call set_visible_devices([],'GPU') explicitly.
 gpus = tf.config.list_physical_devices('GPU')
-if gpus and os.environ.get("FORCE_CPU") != "1":
-    # Heuristic: DirectML reports device_type='GPU' but the device name has no
-    # NVIDIA marker. Safest is to just hide all GPUs unless the user explicitly
-    # wants GPU; we're doing CPU inference here.
+if gpus and os.environ.get("FORCE_CPU") == "1":
     print(f"  Detected GPU devices: {gpus}")
-    print(f"  Hiding GPUs from TF (CPU-only inference for LSTM/BiLSTM compatibility)")
+    print(f"  FORCE_CPU=1 -> hiding all GPUs for CPU-only LSTM/BiLSTM inference")
     try:
         tf.config.set_visible_devices([], 'GPU')
     except Exception as e:
@@ -151,30 +150,65 @@ def prepare_features(df_in):
             X_df[c] = X_df[c].astype("category")
     return X_df
 
-# ----- Load rasters as a stack on the Slope.tif grid (assumed reference) -----
+# ----- Load rasters as a stack on the Slope.tif grid (reference) -----
+# Rasters in 01_Input_Data/rasters/ may have slightly different extents (some
+# were re-extracted in different sessions). Reproject each onto the reference
+# grid (Slope.tif) at load time so they're guaranteed to align pixel-for-pixel.
 print("\n--- Loading raster stack ---")
 ref_path = os.path.join(RAS_DIR, "Slope.tif")
 with rasterio.open(ref_path) as ref:
-    ref_profile = ref.profile.copy()
-    ref_shape   = ref.shape       # (H, W)
-    ref_nodata  = ref.nodata
+    ref_profile   = ref.profile.copy()
+    ref_shape     = ref.shape       # (H, W)
+    ref_nodata    = ref.nodata
+    ref_transform = ref.transform
+    ref_crs       = ref.crs
 
 H, W = ref_shape
 print(f"  Reference grid (Slope.tif): {H} rows x {W} cols = {H*W:,} pixels")
-print(f"  CRS: {ref_profile.get('crs')}, transform: {ref_profile.get('transform')}")
+print(f"  CRS: {ref_crs}")
+print(f"  Transform: {ref_transform}")
 
 stack = {}
+n_reprojected = 0
 for col, fn in tqdm(list(RASTER_COLS.items()), desc="Loading rasters", unit="raster"):
     path = os.path.join(RAS_DIR, fn)
     with rasterio.open(path) as src:
-        if src.shape != ref_shape:
-            sys.exit(f"FATAL: raster grid mismatch on {fn}: {src.shape} vs ref {ref_shape}")
-        arr = src.read(1).astype(np.float32)
-        nd = src.nodata
-        if nd is not None:
-            arr = np.where(arr == nd, np.nan, arr)
+        same_grid = (src.shape == ref_shape and
+                     src.transform == ref_transform and
+                     src.crs == ref_crs)
+        if same_grid:
+            # Native match - read straight
+            arr = src.read(1).astype(np.float32)
+            nd = src.nodata
+            if nd is not None:
+                arr = np.where(arr == nd, np.nan, arr)
+        else:
+            # Reproject onto the reference grid. Use nearest for the categorical
+            # LULC layer, bilinear for everything else (continuous predictors).
+            src_data = src.read(1).astype(np.float32)
+            src_nd = src.nodata
+            if src_nd is not None:
+                src_data = np.where(src_data == src_nd, np.nan, src_data)
+            arr = np.full(ref_shape, np.nan, dtype=np.float32)
+            resampling = Resampling.nearest if col == "LULC" else Resampling.bilinear
+            reproject(
+                source=src_data,
+                destination=arr,
+                src_transform=src.transform,
+                src_crs=src.crs,
+                dst_transform=ref_transform,
+                dst_crs=ref_crs,
+                resampling=resampling,
+                src_nodata=np.nan,
+                dst_nodata=np.nan,
+            )
+            n_reprojected += 1
+            tqdm.write(f"  {fn:30s}  reprojected {src.shape} -> {ref_shape}  "
+                       f"(method={'nearest' if col=='LULC' else 'bilinear'})")
     stack[col] = arr
     tqdm.write(f"  {fn:30s}  min={np.nanmin(arr):.2f}  max={np.nanmax(arr):.2f}")
+
+print(f"\n  Rasters loaded: {len(RASTER_COLS)}  ({n_reprojected} reprojected to reference grid)")
 
 # ----- Build a single 'valid' mask: every pixel with all features present -----
 valid_mask = np.ones((H, W), dtype=bool)
