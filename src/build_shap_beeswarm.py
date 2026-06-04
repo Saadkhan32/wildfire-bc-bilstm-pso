@@ -89,17 +89,53 @@ FEATURE_LABELS = {
     "cat__LULC_2.0":           "LULC (Trees, alt)",
 }
 
+# ----- Full preprocessing replica of BiLSTM PSO FE.py prepare_features() -----
+def is_distance_like(c):
+    lc = c.lower()
+    return ("distance" in lc) or lc.startswith("dist") or ("_dist" in lc) or ("_distance" in lc)
+
+def safe_log1p(x):
+    x = pd.to_numeric(x, errors="coerce").copy()
+    x[x < 0] = np.nan
+    return np.log1p(x)
+
+ID_COLS = {"UniqueID","Unique_ID","unique_id","OBJECTID","ObjectID","objectid","object_id",
+           "FID","Fid","fid","OID","Oid","oid","pointid","PointID","point_id","POINT_ID",
+           "CID","CID_","Cid","cid","ID","Id","id","index","Index","INDEX","row_id","RowID"}
+CAT_LIKE = {"lulc","landuse","land_cover","landcover"}
+
+def prepare_features(df_in):
+    work = df_in.copy()
+    if "Aspect" in work.columns:
+        rad = np.deg2rad(pd.to_numeric(work["Aspect"], errors="coerce"))
+        work["Aspect_sin"] = np.sin(rad)
+        work["Aspect_cos"] = np.cos(rad)
+        work.drop(columns=["Aspect"], inplace=True)
+    for c in list(work.columns):
+        if c != "Status" and is_distance_like(c):
+            work[c] = safe_log1p(work[c])
+    lat_col = next((c for c in work.columns if c.lower() in ["latitude","lat"]), None)
+    lon_col = next((c for c in work.columns if c.lower() in ["longitude","lon","lng"]), None)
+    excluded = {"Status", lat_col, lon_col} | ID_COLS
+    candidates = [c for c in work.columns if c not in excluded]
+    cat_cols = []
+    for c in candidates:
+        if (c.lower() in CAT_LIKE) or (work[c].dtype == "object") or str(work[c].dtype).startswith("category"):
+            cat_cols.append(c)
+    X_df = work[candidates].copy()
+    for c in candidates:
+        if c not in cat_cols:
+            X_df[c] = pd.to_numeric(X_df[c], errors="coerce")
+        else:
+            X_df[c] = X_df[c].astype("category")
+    return X_df
+
 # ----- Load data, model, preprocessor -----
 print(f"\nLoading data: {CSV}")
 df = pd.read_csv(CSV)
 print(f"  rows: {len(df)}")
-
-# Derive Aspect_sin / Aspect_cos exactly as BiLSTM PSO FE.py L124-125 does
-if "Aspect" in df.columns:
-    rad = np.deg2rad(df["Aspect"].astype(float))
-    df["Aspect_sin"] = np.sin(rad)
-    df["Aspect_cos"] = np.cos(rad)
-    print(f"  derived Aspect_sin / Aspect_cos from Aspect")
+df_prepared = prepare_features(df)
+print(f"  prepared X_df: {len(df_prepared.columns)} feature columns")
 
 print(f"\nLoading model: {M_DIR}")
 selected = pd.read_csv(os.path.join(M_DIR, "selected_features_final.csv"))["selected_feature"].tolist()
@@ -109,8 +145,8 @@ model    = tf.keras.models.load_model(os.path.join(M_DIR, "final_model.keras"),
 print(f"  selected feats: {len(selected)}")
 print(f"  model input shape: {model.input_shape}")
 
-# ----- Transform features -----
-Xfull = pre.transform(df)
+# ----- Transform features (use prepared dataframe, not raw df) -----
+Xfull = pre.transform(df_prepared)
 if hasattr(Xfull, "toarray"):
     Xfull = Xfull.toarray()
 
@@ -186,7 +222,9 @@ print(f"Wrote {png_out}")
 
 # Also save raw SHAP values for the manuscript SI
 import pickle
-with open(os.path.join(REPO_ROOT, "revision_c8c11", "06_Final_Tables", "SHAP_BiLSTM_PSO_values.pkl"), "wb") as f:
+tables_dir = os.path.join(REPO_ROOT, "revision_c8c11", "06_Final_Tables")
+os.makedirs(tables_dir, exist_ok=True)
+with open(os.path.join(tables_dir, "SHAP_BiLSTM_PSO_values.pkl"), "wb") as f:
     pickle.dump({
         "shap_values":   shap_values,
         "X_fg":          X_fg,
