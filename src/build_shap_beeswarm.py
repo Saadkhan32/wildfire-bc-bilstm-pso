@@ -72,6 +72,13 @@ print(f"\nLoading data: {CSV}")
 df = pd.read_csv(CSV)
 print(f"  rows: {len(df)}")
 
+# Derive Aspect_sin / Aspect_cos exactly as BiLSTM PSO FE.py L124-125 does
+if "Aspect" in df.columns:
+    rad = np.deg2rad(df["Aspect"].astype(float))
+    df["Aspect_sin"] = np.sin(rad)
+    df["Aspect_cos"] = np.cos(rad)
+    print(f"  derived Aspect_sin / Aspect_cos from Aspect")
+
 print(f"\nLoading model: {M_DIR}")
 selected = pd.read_csv(os.path.join(M_DIR, "selected_features_final.csv"))["selected_feature"].tolist()
 pre      = joblib.load(os.path.join(M_DIR, "static_preprocessor.joblib"))

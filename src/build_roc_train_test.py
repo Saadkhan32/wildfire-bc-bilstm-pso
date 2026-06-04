@@ -54,6 +54,14 @@ print(f"\nLoading training data: {CSV_70_42}")
 df = pd.read_csv(CSV_70_42)
 print(f"  rows: {len(df)}, cols: {len(df.columns)}")
 
+# Derive Aspect_sin / Aspect_cos exactly as both trainers do (BiLSTM PSO FE.py L124-125,
+# c8c11_non_pso_cli.py L101). PSO preprocessor's column transformer expects these columns.
+if "Aspect" in df.columns:
+    rad = np.deg2rad(df["Aspect"].astype(float))
+    df["Aspect_sin"] = np.sin(rad)
+    df["Aspect_cos"] = np.cos(rad)
+    print(f"  derived Aspect_sin / Aspect_cos from Aspect")
+
 # Target column is 'Status' (1 = fire, 0 = pseudo-absence)
 y_all = df["Status"].to_numpy().astype(int)
 print(f"  Status: {dict(zip(*np.unique(y_all, return_counts=True)))}")
