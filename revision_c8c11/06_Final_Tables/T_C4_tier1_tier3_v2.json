@@ -1,0 +1,59 @@
+{
+  "grid": {
+    "rows": 109,
+    "cols": 506,
+    "cell_m": 1500,
+    "epsg": 3005
+  },
+  "tier1": {
+    "primary_tile_km": 20,
+    "primary_kappa_quadratic": 0.3857142857142857,
+    "sweep": {
+      "15": {
+        "n_tiles": 38,
+        "spearman_rho": 0.5012583433636065,
+        "p": 0.001347059231262785
+      },
+      "20": {
+        "n_tiles": 34,
+        "spearman_rho": 0.4203208556149732,
+        "p": 0.013321754395295846
+      },
+      "25": {
+        "n_tiles": 27,
+        "spearman_rho": 0.3455433455433455,
+        "p": 0.07750092759306054
+      },
+      "30": {
+        "n_tiles": 23,
+        "spearman_rho": 0.567193675889328,
+        "p": 0.004765683175308171
+      }
+    },
+    "min_cells_per_side": 3
+  },
+  "tier3": {
+    "near_band_m": 5000,
+    "BC_within_product": {
+      "near_n": 1240,
+      "far_n": 12490,
+      "near_median": 0.8714286206446201,
+      "far_median": 0.8708960430721537,
+      "near_mean": 0.7729388215511283,
+      "far_mean": 0.769297802100112,
+      "mannwhitney_p": 0.7173293652062547,
+      "verdict": "no artificial edge (near ~ far)"
+    },
+    "US_within_product": {
+      "near_n": 1564,
+      "far_n": 13502,
+      "near_median": 0.003794596268424887,
+      "far_median": 0.005142901392710659,
+      "near_mean": 0.004927073466637924,
+      "far_mean": 0.008086793200669481,
+      "mannwhitney_p": 2.803443627137864e-16,
+      "verdict": "near-border differs from interior"
+    },
+    "note": "Within-product test on a common scale. The earlier cross-product raw-value Mann-Whitney was invalid (BC ~0-1 vs BP ~0-0.06 never overlap -> spurious perfect separation)."
+  }
+}
