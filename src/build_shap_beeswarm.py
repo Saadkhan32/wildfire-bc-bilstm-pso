@@ -24,7 +24,29 @@ import matplotlib.pyplot as plt
 
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 print(f"TF {tf.__version__}")
+
+# ----- Custom layer (only needed for non-PSO models; harmless to register here) -----
+try:
+    register_ks = keras.saving.register_keras_serializable
+except Exception:
+    register_ks = keras.utils.register_keras_serializable
+
+@register_ks(package="Wildfire")
+class AttentionPool1D(layers.Layer):
+    def __init__(self, attn_units=128, **kwargs):
+        super().__init__(**kwargs)
+        self.attn_units = int(attn_units)
+        self.d1 = layers.Dense(self.attn_units, activation="tanh")
+        self.d2 = layers.Dense(1)
+        self.softmax = layers.Softmax(axis=1)
+    def call(self, x):
+        a = self.softmax(self.d2(self.d1(x)))
+        return tf.reduce_sum(x * a, axis=1)
+    def get_config(self):
+        return {"attn_units": self.attn_units, **super().get_config()}
 
 try:
     import shap
@@ -83,7 +105,7 @@ print(f"\nLoading model: {M_DIR}")
 selected = pd.read_csv(os.path.join(M_DIR, "selected_features_final.csv"))["selected_feature"].tolist()
 pre      = joblib.load(os.path.join(M_DIR, "static_preprocessor.joblib"))
 model    = tf.keras.models.load_model(os.path.join(M_DIR, "final_model.keras"),
-                                       compile=False, safe_mode=False)
+                                       compile=False)
 print(f"  selected feats: {len(selected)}")
 print(f"  model input shape: {model.input_shape}")
 

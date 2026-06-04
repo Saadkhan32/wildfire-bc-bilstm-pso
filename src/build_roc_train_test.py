@@ -27,8 +27,32 @@ from sklearn.metrics import roc_curve, roc_auc_score
 # Suppress TF info logs
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 print(f"TF {tf.__version__}")
 print(f"GPUs: {tf.config.list_physical_devices('GPU')}")
+
+# ----- Custom layer used by non-PSO LSTM/BiLSTM models -----
+# Must mirror c8c11_non_pso_cli.py L180-192 so Keras can deserialize the
+# Wildfire>AttentionPool1D layer in saved final_model.keras files.
+try:
+    register_ks = keras.saving.register_keras_serializable
+except Exception:
+    register_ks = keras.utils.register_keras_serializable
+
+@register_ks(package="Wildfire")
+class AttentionPool1D(layers.Layer):
+    def __init__(self, attn_units=128, **kwargs):
+        super().__init__(**kwargs)
+        self.attn_units = int(attn_units)
+        self.d1 = layers.Dense(self.attn_units, activation="tanh")
+        self.d2 = layers.Dense(1)
+        self.softmax = layers.Softmax(axis=1)
+    def call(self, x):
+        a = self.softmax(self.d2(self.d1(x)))
+        return tf.reduce_sum(x * a, axis=1)
+    def get_config(self):
+        return {"attn_units": self.attn_units, **super().get_config()}
 
 # ----- Paths -----
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -114,7 +138,7 @@ def model_predict(model_key):
         Xfull = Xfull.toarray()
     X = Xfull[:, sel_idx].astype(np.float32)
 
-    model = tf.keras.models.load_model(keras_path, compile=False, safe_mode=False)
+    model = tf.keras.models.load_model(keras_path, compile=False)
     t0 = time.time()
     y_pred = model.predict(X, verbose=0, batch_size=256).flatten()
     print(f"  [{model_key}] prediction done in {time.time()-t0:.1f}s, shape={y_pred.shape}")
