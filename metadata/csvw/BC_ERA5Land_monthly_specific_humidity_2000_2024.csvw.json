@@ -1,0 +1,33 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "../../data/climate/BC_ERA5Land_monthly_specific_humidity_2000_2024.csv",
+  "dc:title": "BC_ERA5Land_monthly_specific_humidity_2000_2024",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dialect": {
+    "header": true,
+    "encoding": "utf-8",
+    "delimiter": ","
+  },
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "year",
+        "titles": "year",
+        "datatype": "string",
+        "dc:description": "year"
+      },
+      {
+        "name": "month",
+        "titles": "month",
+        "datatype": "number",
+        "dc:description": "month"
+      },
+      {
+        "name": "specific_humidity_mean",
+        "titles": "specific_humidity_mean",
+        "datatype": "number",
+        "dc:description": "specific_humidity_mean"
+      }
+    ]
+  }
+}

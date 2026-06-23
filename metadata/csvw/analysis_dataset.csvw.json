@@ -1,0 +1,129 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "../../data/analysis_dataset.csv",
+  "dc:title": "analysis_dataset",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dialect": {
+    "header": true,
+    "encoding": "utf-8",
+    "delimiter": ","
+  },
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "year",
+        "titles": "year",
+        "datatype": "string",
+        "dc:description": "year"
+      },
+      {
+        "name": "Tmax",
+        "titles": "Tmax",
+        "datatype": "number",
+        "dc:description": "Tmax"
+      },
+      {
+        "name": "Precip",
+        "titles": "Precip",
+        "datatype": "number",
+        "dc:description": "Precip"
+      },
+      {
+        "name": "Wind",
+        "titles": "Wind",
+        "datatype": "number",
+        "dc:description": "Wind"
+      },
+      {
+        "name": "PDSI",
+        "titles": "PDSI",
+        "datatype": "number",
+        "dc:description": "PDSI"
+      },
+      {
+        "name": "Soil",
+        "titles": "Soil",
+        "datatype": "number",
+        "dc:description": "Soil"
+      },
+      {
+        "name": "AET",
+        "titles": "AET",
+        "datatype": "number",
+        "dc:description": "AET"
+      },
+      {
+        "name": "counts",
+        "titles": "counts",
+        "datatype": "number",
+        "dc:description": "counts"
+      },
+      {
+        "name": "ab",
+        "titles": "ab",
+        "datatype": "number",
+        "dc:description": "ab"
+      },
+      {
+        "name": "oni_djf",
+        "titles": "oni_djf",
+        "datatype": "number",
+        "dc:description": "oni_djf"
+      },
+      {
+        "name": "oni_mam",
+        "titles": "oni_mam",
+        "datatype": "number",
+        "dc:description": "oni_mam"
+      },
+      {
+        "name": "oni_jja",
+        "titles": "oni_jja",
+        "datatype": "number",
+        "dc:description": "oni_jja"
+      },
+      {
+        "name": "pdo_djf",
+        "titles": "pdo_djf",
+        "datatype": "number",
+        "dc:description": "pdo_djf"
+      },
+      {
+        "name": "pdo_mam",
+        "titles": "pdo_mam",
+        "datatype": "number",
+        "dc:description": "pdo_mam"
+      },
+      {
+        "name": "pdo_jja",
+        "titles": "pdo_jja",
+        "datatype": "number",
+        "dc:description": "pdo_jja"
+      },
+      {
+        "name": "n70",
+        "titles": "n70",
+        "datatype": "number",
+        "dc:description": "n70"
+      },
+      {
+        "name": "area70",
+        "titles": "area70",
+        "datatype": "number",
+        "dc:description": "area70"
+      },
+      {
+        "name": "n70_lightning",
+        "titles": "n70_lightning",
+        "datatype": "number",
+        "dc:description": "n70_lightning"
+      },
+      {
+        "name": "SH",
+        "titles": "SH",
+        "datatype": "number",
+        "dc:description": "SH"
+      }
+    ]
+  }
+}

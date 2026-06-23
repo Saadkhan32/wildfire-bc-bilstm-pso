@@ -1,0 +1,18 @@
+file_or_folder,title,type,crs,provider,licence
+data/rasters/,Conditioning-factor rasters (18 layers),raster grid,EPSG:3005,Derived (SRTM/Landsat-8/TerraClimate/ERA5-Land/Esri/StatCan),CC-BY-4.0
+data/susceptibility/,Modelled susceptibility maps (4 models),raster grid,EPSG:3005,This study,CC-BY-4.0
+data/processed/fires_geq_70ha.*,BC wildfire perimeters >=70 ha,vector,EPSG:3005,CWFIS/NFDB (Govt of Canada),open / provider terms
+data/cross_border_US/BP_WA_ID_MT.tif,U.S. FSim annual burn probability (WA/ID/MT),raster grid,native USA Albers 270 m -> EPSG:3005,USDA Forest Service (WRC/FSim),provider terms
+"data/cross_border_US/{bc_strip,us_strip,bc_us_border}.*",49N sampling strips & border line,vector,EPSG:3005,This study,CC-BY-4.0
+data/fire_records_US/fpa_fod_WA_ID_MT.*,U.S. FPA-FOD fires (WA/ID/MT),vector,EPSG:4269,USDA Forest Service (FPA-FOD),provider terms
+data/boundaries/bc_boundary.*,British Columbia boundary,vector,EPSG:3347,Statistics Canada,open / provider terms
+data/boundaries/cb_2023_us_state_5m.*,U.S. state polygons (2023),vector,EPSG:4269,U.S. Census Bureau,public domain
+data/climate/*.csv,Monthly ERA5-Land + TerraClimate tables,table,-,ERA5-Land; TerraClimate,provider terms
+data/raw/oni.ascii.txt,Oceanic Nino Index (ONI),table,-,NOAA CPC,public domain
+data/raw/meiv2.txt,Multivariate ENSO Index v2 (MEI v2),table,-,NOAA PSL,public domain
+data/raw/pdo.csv,Pacific Decadal Oscillation (PDO),table,-,NOAA PSL,public domain
+data/training_points_*.csv,Modelling tables (70/100/200 ha; 10 seeds),table,points in EPSG:3005 / WGS84 lon-lat,This study,CC-BY-4.0
+data/analysis_dataset.csv,Annual area-burned vs climate/teleconnection table,table,-,This study,CC-BY-4.0
+data/anthropogenic_sources/households_PHH/PHH-BC.*,Pseudo-household points (geometry-only),vector,EPSG:4326,Statistics Canada (PHH 2021),StatCan Open Licence
+data/anthropogenic_sources/road_network/bc_roads.*,BC road network lines (geometry-only),vector,NAD83 LCC (custom),Statistics Canada (Road Network File),StatCan Open Licence
+data/susceptibility/BC_susceptibility_*.csv,Per-model susceptibility probability tables (4 models),table (CSV),x/y in EPSG:3005,This study,CC-BY-4.0

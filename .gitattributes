@@ -1,0 +1,16 @@
+* text=auto eol=lf
+*.tif binary
+*.tiff binary
+*.png binary
+*.pdf binary
+*.shp binary
+*.shx binary
+*.dbf binary
+*.sbn binary
+*.sbx binary
+*.pkl binary
+*.joblib binary
+*.keras binary
+*.xlsx binary
+data/cross_border_US/Fig19b_tile_pairs.csv binary
+data/cross_border_US/Fig19c_Table8_crossborder_stats.json binary

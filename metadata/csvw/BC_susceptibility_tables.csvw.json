@@ -1,0 +1,33 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "../../data/susceptibility/BC_susceptibility_BiLSTM_PSO.csv",
+  "dc:title": "Per-model wildfire susceptibility probability tables (BC_susceptibility_{LSTM,BiLSTM,LSTM_PSO,BiLSTM_PSO}.csv)",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dialect": {
+    "header": true,
+    "encoding": "utf-8",
+    "delimiter": ","
+  },
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "x_epsg3005",
+        "titles": "x_epsg3005",
+        "datatype": "number",
+        "dc:description": "Cell-centre easting, NAD83 BC Albers EPSG:3005 (m)"
+      },
+      {
+        "name": "y_epsg3005",
+        "titles": "y_epsg3005",
+        "datatype": "number",
+        "dc:description": "Cell-centre northing, NAD83 BC Albers EPSG:3005 (m)"
+      },
+      {
+        "name": "probability",
+        "titles": "probability",
+        "datatype": "number",
+        "dc:description": "Modelled relative wildfire susceptibility index (0-1) at the 1.5 km cell"
+      }
+    ]
+  }
+}
