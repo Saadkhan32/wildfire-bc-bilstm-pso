@@ -186,6 +186,10 @@ SUMMARY:  <n> pass | <n> warn | 0 fail
 
 To run the full pipeline afterwards, follow the stage-by-stage index in
 `src/README.md`; the reviewer-oriented walkthrough is `REVIEWER_GUIDE.md`.
+Quick visual checks once the archives are unpacked: `python make_roc_figure.py`
+rebuilds the four-model ROC figure from the trained weights, and
+`python src/fig_wildfire_trend.py` rebuilds the annual trend figure (both
+write into `figs/`).
 
 ### Verify file integrity
 

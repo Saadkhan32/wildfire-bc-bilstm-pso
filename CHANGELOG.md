@@ -12,6 +12,10 @@
   Figure 12 script; the archive is now self-sufficient for Zenodo-only users.
 - metadata/checksums_sha256.txt updated accordingly.
 - README: extraction instructions rewritten for the flat archives.
+- New make_roc_figure.py (package root): rebuilds the four-model train/test
+  ROC figure from the archived training table and trained weights using
+  package paths; --check mode verifies inputs. Replaces the working-copy-only
+  src/build_roc_train_test.py in the reviewer guide.
 
 ## v1.1.4 - 2026-08-12
 - No-overlap packaging: the six files that existed both in git and in the

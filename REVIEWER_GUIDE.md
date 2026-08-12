@@ -9,19 +9,28 @@ package (Zenodo, concept DOI 10.5281/zenodo.20389083) or the GitHub repository
 Download every file from the Zenodo record into one empty folder, then:
 
 ```bash
-sha256sum -c MANIFEST_sha256.txt        # verifies the download (all 16 files)
-unzip code.zip; unzip data.zip; unzip metadata.zip; unzip models.zip
-sha256sum -c metadata/checksums_sha256.txt   # verifies the unpacked content
+sha256sum -c MANIFEST_sha256.txt
+unzip code.zip
+unzip data.zip -d data
+unzip models.zip -d models
+unzip metadata.zip -d metadata
+cp data/climate/BC_*.csv data/
+sha256sum -c metadata/checksums_sha256.txt
 ```
 
-Both commands are run from the package root and must report OK for every line.
+The first checksum line verifies the downloaded files against the manifest;
+the last verifies the unpacked content. Run both from the package root — every
+line must report OK. The archives contain their folder contents directly, so
+`data.zip`, `models.zip` and `metadata.zip` are extracted into folders of the
+same name (`-d`); the `cp` line places the five monthly-climate CSVs where a
+few scripts expect them.
 
 ## 2. Set up the environment
 
 ```bash
 conda env create -f environment.yml     # pinned versions: environment.lock.yml
 conda activate wildfire
-R -e "renv::restore()"                  # R components (terra, sf, blockCV)
+Rscript -e "renv::restore()"            # R components (terra, sf, blockCV)
 python test_reproducibility.py          # environment + headline-metric smoke test
 ```
 
@@ -39,7 +48,7 @@ documents its inputs and arguments in its header.
 | Spatial autocorrelation checks | `src/c8_assumption_checks.py` |
 | Susceptibility prediction (four models) | `src/predict_bc_4models.py` |
 | Class-area summary | `src/predict_bc_susceptibility.py` |
-| ROC curves (train/test) | `src/build_roc_train_test.py` |
+| ROC curves (train/test) | `make_roc_figure.py` (package root) |
 | SHAP explanation (Fig. 17) | `src/build_shap_beeswarm.py`; `src/specific_humidity_update/Figure17_SHAP_beeswarm_specific_humidity.py` |
 | ENSO/PDO teleconnections (Fig. 18) | `src/phase_f_enso_pdo.py`; `src/specific_humidity_update/Figure18_ENSO_PDO_teleconnection_specific_humidity.py` |
 | Cross-border comparison (Fig. S6b) | `src/cross_border_c4.py` |
