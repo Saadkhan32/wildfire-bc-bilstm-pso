@@ -2,11 +2,43 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20389083.svg)](https://doi.org/10.5281/zenodo.20389083)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10](https://img.shields.io/badge/Python-3.10-blue.svg)](environment.yml)
+[![TensorFlow 2.15](https://img.shields.io/badge/TensorFlow-2.15-orange.svg)](environment.lock.yml)
 
 Code, data, and metadata supporting **Khan et al. (2026)**, *Ecological Informatics*
 (manuscript **ECOINF-D-26-01275**):
 
 > **Geospatial Deep Learning and SHAP-Based Explainable AI for Wildfire Susceptibility and Exposure Mapping in Western Canada**
+
+## Quick start
+
+```
+git clone https://github.com/Saadkhan32/wildfire-bc-bilstm-pso.git
+cd wildfire-bc-bilstm-pso
+git checkout v1.1-revision2
+conda env create -f environment.yml
+conda activate wildfire
+python test_reproducibility.py
+```
+
+Then download `data.zip` and `models.zip` from the
+[Zenodo record](https://doi.org/10.5281/zenodo.20389083), unpack them into the
+repository root, and run `python reproduce.py` — one command that rebuilds
+every result derivable from the shipped data and trained models. Details,
+expected outputs and troubleshooting below. This full path has been executed
+end to end on an independent Windows machine.
+
+**Contents:**
+[What this study does](#what-this-study-does) ·
+[Where to find what](#where-to-find-what) ·
+[Two ways to use this package](#two-ways-to-use-this-package) ·
+[Repository layout](#repository-layout) ·
+[Reproducing the analysis](#reproducing-the-analysis) ·
+[Troubleshooting](#troubleshooting) ·
+[CRS](#coordinate-reference-system) ·
+[Metadata standards](#metadata-standards) ·
+[Licensing](#licensing) ·
+[Citation](#citation)
 
 ## What this study does
 
@@ -27,18 +59,21 @@ manuscript figure.
 | You want… | Go to |
 |---|---|
 | Source code (version-controlled, latest) | this GitHub repository |
-| The exact frozen version behind the paper, incl. **data + trained models** | Zenodo: **https://doi.org/10.5281/zenodo.20389083** |
+| The permanent citable archive incl. **data + trained models** | Zenodo: **https://doi.org/10.5281/zenodo.20389083** |
+| Result-by-result reproducibility map | `REVIEWER_GUIDE.md` |
 | Dataset index (what every data file is) | `data/README.md`, shipped inside `data.zip`; summary: `metadata/dataset_inventory.csv` |
 | Metadata (ISO 19115-2, CSVW, checksums) | `metadata/` — here and on Zenodo |
 | Third-party input data | not redistributed — `DATA_SOURCES.md` lists provider, link, and licence for each |
 
 **How GitHub and Zenodo relate.** GitHub hosts the living code; Zenodo is the
 permanent, citable archive of code + data + metadata. The DOI above is the
-*concept DOI*: it always resolves to the newest archived version. Each archived
-version additionally has its own immutable DOI — the version used in this study
-is **https://doi.org/10.5281/zenodo.21899021**, which matches git tag
-`v1.1-revision2` in this repository (the archived `code.zip` is byte-identical
-to that tag).
+*concept DOI*: it always resolves to the newest archived version (currently
+v1.2.0, https://doi.org/10.5281/zenodo.21910108). Each archived version also
+has its own immutable DOI — the version cited in the manuscript is
+**https://doi.org/10.5281/zenodo.21899021**; later versions changed packaging
+and documentation only. The analysis code is identical throughout: the
+archived `code.zip` is byte-identical to git tag `v1.1-revision2` in this
+repository.
 
 ## Two ways to use this package
 
@@ -90,7 +125,8 @@ tar -xf "%USERPROFILE%\Downloads\models.zip" -C models
 loose documentation files from the Zenodo record and unpack the archives side
 by side into one folder. `code.zip` provides `src/`, `R/` and `notebooks/`;
 `metadata.zip` provides `metadata/`. Everything the archives deliver is
-verifiable with `metadata/checksums_sha256.txt`.
+verifiable with `metadata/checksums_sha256.txt`. Full walkthrough:
+`HOW_TO_ASSEMBLE.txt` on the record.
 
 *Path B note:* a few scripts read five small monthly-climate CSVs from
 `data/` directly; copy them from `data/climate/` up one level into `data/`
@@ -118,6 +154,10 @@ metadata/
   csvw/         CSVW (JSON-LD) dictionaries -- one per tabular dataset
   checksums_sha256.txt, dataset_inventory.csv, data_dictionary.csv
 docs/           see docs/README.md (drafts are not distributed here)
+reproduce.py            one-command reproduction (checks + all rebuildable figures)
+make_roc_figure.py      ROC curves only, from the trained models
+test_reproducibility.py environment + headline-metric smoke test
+figure_style.py         shared Matplotlib style helper
 CHANGELOG.md  CITATION.cff  DATA_SOURCES.md  METHODS.md  REVIEWER_GUIDE.md
 environment.yml / environment.lock.yml / renv.lock   (pinned environments)
 ```
@@ -157,7 +197,7 @@ python test_reproducibility.py
    (TensorFlow/Keras 2.15; exact versions in `environment.lock.yml`). The
    first run takes several minutes.
 4. `conda activate wildfire` — switch into that environment.
-5. `python test_reproducibility.py` — run the smoke test (next section).
+5. `python test_reproducibility.py` — run the smoke test (below).
 
 Optional, only if you want to rebuild the R-based figures (requires R ≥ 4.2):
 
@@ -180,26 +220,36 @@ SUMMARY:  <n> pass | <n> warn | 0 fail
   (~63 MB) from the Zenodo record — these two only, see *Two ways to use this
   package* above — and unpack both into the repository root. They add files
   without touching any file git put there, so no overwrite prompts appear.
-  Then re-run step 4. The test then also reproduces the manuscript's Theil-Sen
-  climate trend values deterministically (seeds fixed at 42) and must end with
-  `0 fail`.
+  Then re-run the smoke test: it now also reproduces the manuscript's
+  Theil-Sen climate trend values deterministically (seeds fixed at 42) and
+  must end `35 pass | 0 warn | 0 fail`.
 
 ### One-command reproduction from the trained models
 
 Once `data.zip` and `models.zip` are unpacked, a single command runs the
 checks and rebuilds every result derivable from the shipped data and
-already-trained models (no retraining):
+already-trained models (no retraining; a few minutes total):
 
 ```
 python reproduce.py
 ```
 
-It runs the smoke test, the four-model train/test ROC figure (from the
-trained weights), the annual wildfire trend figure, the seasonal climate
-composites (Fig. 12), the SHAP beeswarm (Fig. 17) and the ENSO/PDO
-teleconnection figure (Fig. 18), then prints a PASS/FAIL summary; outputs
-land in `figs/`. The complete result-by-result reproducibility map is in
-`REVIEWER_GUIDE.md`.
+Expected final summary:
+
+```
+REPRODUCTION SUMMARY
+  [PASS] Environment / package checks
+  [PASS] ROC curves from trained models
+  [PASS] Annual wildfire trend figure
+  [PASS] Seasonal climate composites (Fig. 12)
+  [PASS] SHAP beeswarm (Fig. 17)
+  [PASS] ENSO/PDO teleconnections (Fig. 18)
+All steps passed.
+```
+
+Outputs land in `figs/`. The complete result-by-result reproducibility map —
+covering every quantitative manuscript result, including those shipped as
+computed tables and grids — is in `REVIEWER_GUIDE.md`.
 
 Each step is also available on its own — for only the ROC curves from the
 trained models:
@@ -209,7 +259,7 @@ python make_roc_figure.py
 ```
 
 To run the full pipeline beyond that, follow the stage-by-stage index in
-`src/README.md`; the reviewer-oriented walkthrough is `REVIEWER_GUIDE.md`.
+`src/README.md`.
 
 ### Verify file integrity
 
@@ -261,7 +311,8 @@ DataCite via Zenodo; SHA-256 checksums. These records follow the ISO 19115-2 sch
 
 ## Citation
 
-Cite the article and the archive (machine-readable: `CITATION.cff`):
+Cite the article and the archive. `CITATION.cff` is machine-readable — GitHub's
+"Cite this repository" button uses it.
 
 > Khan, M.S., Farooque, A.A., Al-Mughrabi, T., Malekian, R., Wang, X., Esau, T.J.,
 > Uz Zaman, Q. (2026). Geospatial Deep Learning and SHAP-Based Explainable AI for

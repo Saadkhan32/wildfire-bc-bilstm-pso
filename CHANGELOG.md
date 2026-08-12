@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.1 - 2026-08-12
+- Documentation polish (GitHub): README gains a quick start, contents bar,
+  current version DOIs and the expected outputs of the smoke test and of
+  reproduce.py; the reviewer guide gains a 10-minute verification path,
+  expected summary lines, and a note explaining the ROC step's informational
+  sanity flag. No code or data changes; the published Zenodo v1.2.0 record is
+  unaffected.
+
 ## v1.2.0 - 2026-08-12
 - Zenodo archives restructured (new Zenodo version): data.zip, models.zip and
   metadata.zip now contain the folder contents directly, without a wrapper
