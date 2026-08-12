@@ -28,6 +28,7 @@ manuscript figure.
 |---|---|
 | Source code (version-controlled, latest) | this GitHub repository |
 | The exact frozen version behind the paper, incl. **data + trained models** | Zenodo: **https://doi.org/10.5281/zenodo.20389083** |
+| Dataset index (what every data file is) | `data/README.md`, shipped inside `data.zip`; summary: `metadata/dataset_inventory.csv` |
 | Metadata (ISO 19115-2, CSVW, checksums) | `metadata/` — here and on Zenodo |
 | Third-party input data | not redistributed — `DATA_SOURCES.md` lists provider, link, and licence for each |
 
@@ -39,6 +40,33 @@ is **https://doi.org/10.5281/zenodo.21899021**, which matches git tag
 `v1.1-revision2` in this repository (the archived `code.zip` is byte-identical
 to that tag).
 
+## Two ways to use this package
+
+The Zenodo record contains four archives. **They do not overlap with this
+repository**: no file tracked in git is also inside `data.zip` or
+`models.zip`, so the archives unpack over a clone cleanly, with no
+"replace file?" prompts.
+
+| Archive | Contains | Needed by |
+|---|---|---|
+| `data.zip` (~358 MB) | `data/` — rasters, climate series, SHAP values, training points | everyone reproducing results |
+| `models.zip` (~71 MB) | `models/` — trained Keras weights + CV metrics | everyone reproducing results |
+| `code.zip` (small) | `src/`, `R/`, `notebooks/` — snapshot of the repository code | **Zenodo-only users** (no git) |
+| `metadata.zip` (small) | `metadata/` — snapshot of the repository metadata | **Zenodo-only users** (no git) |
+
+**Path A — GitHub clone (recommended).** Clone this repository (steps below),
+then download **only `data.zip` and `models.zip`** from Zenodo and unpack both
+into the repository root (the folder containing this README). Do **not**
+unpack `code.zip` or `metadata.zip` over a clone — they are complete copies of
+the code and metadata for Path B users and would only duplicate what git
+already gave you.
+
+**Path B — Zenodo only (no git needed).** Download all four archives and the
+loose documentation files from the Zenodo record and unpack the archives side
+by side into one folder. `code.zip` provides `src/`, `R/` and `notebooks/`;
+`metadata.zip` provides `metadata/`. The result is the same tree as Path A,
+verifiable with `metadata/checksums_sha256.txt`.
+
 ## Repository layout
 
 ```
@@ -46,11 +74,13 @@ src/            Python pipeline (see src/README.md for the stage-by-stage index)
 R/              R scripts (terra, sf, blockCV, ggplot2)
 notebooks/      Jupyter notebooks, numbered in execution order
 data/
-  processed/    tracked lightweight datasets (points, annual fire series)
-  raw/, rasters/, susceptibility/, climate/, cross_border_US/
-                large files -- download data.zip from Zenodo (unpacks here);
-                full dataset index: data/README.md
-models/         trained Keras weights -- models.zip on Zenodo
+  processed/    lightweight derived datasets tracked in git (LISA layers,
+                fire subsets, annual series); the >=70 ha fire perimeters
+                arrive with data.zip
+  climate/, rasters/, susceptibility/, shap/, raw/, ...
+                filled by data.zip from Zenodo (not tracked in git);
+                full dataset index: data/README.md inside data.zip
+models/         filled by models.zip from Zenodo (not tracked in git)
 figs/           manuscript figures (figs/manuscript_R2/ = revision-2 finals,
                 each as editable PPTX + vector PDF + 400 dpi PNG)
 tables/         exported result tables incl. the Theil-Sen CI trend register
@@ -118,8 +148,10 @@ SUMMARY:  <n> pass | <n> warn | 0 fail
   reported as warnings. That is the expected result and confirms the
   environment is correct.
 - **Full reproduction:** download `data.zip` (~358 MB) and `models.zip`
-  (~71 MB) from the Zenodo record and unpack both into the repository root,
-  then re-run step 4. The test then also reproduces the manuscript's Theil-Sen
+  (~71 MB) from the Zenodo record — these two only, see *Two ways to use this
+  package* above — and unpack both into the repository root. They add files
+  without touching any file git put there, so no overwrite prompts appear.
+  Then re-run step 4. The test then also reproduces the manuscript's Theil-Sen
   climate trend values deterministically (seeds fixed at 42) and must end with
   `0 fail`.
 

@@ -46,7 +46,7 @@ documents its inputs and arguments in its header.
 
 ## 4. Data documentation
 
-- `data/README.md` (in the repository) — dataset index with ISO 19115-2 record,
+- `data/README.md` (shipped inside data.zip) — dataset index with ISO 19115-2 record,
   provider and licence per dataset group
 - `metadata/iso19115/` — one ISO 19115-2 XML record per dataset group
 - `metadata/csvw/` — CSVW (JSON-LD) dictionary per tabular dataset

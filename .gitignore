@@ -107,3 +107,20 @@ __pycache__/
 REPRODUCIBILITY_REPORT.md
 src/.revision_step3_paths.json
 tables/T_fig5a_trend_methods.csv
+
+# --- delivered by the Zenodo archives (data.zip / models.zip), not tracked in git ---
+# keeps `git status` clean after unpacking the archives into the repository root
+data/README.md
+data/analysis_dataset.csv
+data/training_points_*.csv
+data/anthropogenic_sources/
+data/boundaries/
+data/climate/
+data/cross_border_US/
+data/fire_records_US/
+data/rasters/
+data/shap/
+data/susceptibility/
+data/processed/fires_geq_70ha.*
+models/**
+!models/.gitkeep

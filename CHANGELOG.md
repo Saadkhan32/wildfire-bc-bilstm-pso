@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.4 - 2026-08-12
+- No-overlap packaging: the six files that existed both in git and in the
+  Zenodo data.zip (data/README.md and the >=70 ha fire-perimeter shapefile)
+  are now delivered by data.zip only, so the archives unpack over a clone
+  without overwrite prompts; .gitignore extended to keep git status clean
+  after unpacking.
+- README: "Two ways to use this package" - archive-by-archive table and
+  separate GitHub (data.zip + models.zip only) and Zenodo-only paths.
+- Tag v1.1-revision2 moved to this state so the tagged tree shows the
+  authors' final figures; the archived code.zip remains byte-identical to
+  the tag (src/, R/, notebooks/ unchanged).
+
 ## v1.1.3 - 2026-08-12
 - Figures: replaced the reconstructed Figure 2 and Figure 4 sources with the
   authors' final versions (Fig2_in_manuscript; LSTM_Final, BiLSTM_Final and
