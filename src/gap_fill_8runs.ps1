@@ -4,7 +4,7 @@
 #  Resumable: skips 40 already-complete cells automatically.
 #  Retries up to 3 times to defeat transient CUDA_ERROR_UNKNOWN.
 # ============================================================
-#  Run from:  C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\
+#  Run from the repository root.
 #  PowerShell:  .\src\gap_fill_8runs.ps1
 # ============================================================
 

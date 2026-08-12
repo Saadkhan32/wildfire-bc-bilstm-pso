@@ -8,10 +8,9 @@
   (10.5281/zenodo.20389083), CRS/EPSG statement, metadata standards, verified
   reproduce steps.
 - Citation metadata: CITATION.cff (CFF 1.2, with ORCIDs and preferred-citation) and
-  .zenodo.json aligned with the revised article title.
+  .zenodo.json aligned with the article and archive identifiers.
 - Figures: reconstructed Figures 2 and 4 (editable PPTX + vector PDF + 400 dpi PNG)
-  and revised trend figures with Theil–Sen 95% CIs (`figs/manuscript_R2/`).
-- Trend analysis register with confidence intervals (`tables/`).
+  and revised trend figures (`figs/manuscript_R2/`).
 - Added annual ≥70 ha fire series to `data/processed/` with CSVW dictionary.
 - Repository cleanup: reviewer working folders untracked; GEE script consolidated to
   `src/gee/`; DOI-checker tools in `src/tools/`.

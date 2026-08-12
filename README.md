@@ -3,8 +3,7 @@
 Code, data, and metadata supporting **Khan et al. (2026)**, *Ecological Informatics*
 (manuscript **ECOINF-D-26-01275**):
 
-> **Geospatial Deep Learning and SHAP-Based Explanation for Wildfire Susceptibility
-> and Exposure Assessment in Western Canada**
+> **An Interpretable Deep Learning Framework for Wildfire Susceptibility and Exposure Assessment in Western Canada**
 
 ## Where to find what
 
@@ -21,16 +20,26 @@ each version also has its own DOI, shown on the Zenodo page.
 
 ## Repository layout
 
-- `code/`, `src/` — Python modules (TensorFlow 2.15, PySAL, SHAP)
-- `notebooks/` — Jupyter, numbered in execution order
-- `R/` — R scripts (terra, sf, blockCV, ggplot2)
-- `data/{raw,interim,processed}` — inputs and derived datasets (large files on Zenodo)
-- `models/` — trained Keras weights (archived on Zenodo)
-- `figs/`, `tables/` — manuscript figures and exported tables
-- `metadata/iso19115/` — **ISO 19115-2 XML records** for every dataset group used or created
-- `metadata/csvw/` — **CSVW (JSON-LD) data dictionaries** for every tabular dataset
-- `metadata/checksums_sha256.txt` — SHA-256 integrity hashes
-- `docs/` — manuscript and supplementary drafts
+```
+src/            Python pipeline (see src/README.md for the stage-by-stage index)
+R/              R scripts (terra, sf, blockCV, ggplot2)
+notebooks/      Jupyter notebooks, numbered in execution order
+data/
+  processed/    tracked lightweight datasets (points, annual fire series)
+  raw/, rasters/, susceptibility/, climate/, cross_border_US/
+                large files -- download data.zip from Zenodo (unpacks here);
+                full dataset index: data/README.md
+models/         trained Keras weights -- models.zip on Zenodo
+figs/           manuscript figures (figs/manuscript_R2/ = revision-2 finals)
+tables/         exported result tables incl. the Theil-Sen CI trend register
+metadata/
+  iso19115/     ISO 19115-2 XML -- one record per dataset group
+  csvw/         CSVW (JSON-LD) dictionaries -- one per tabular dataset
+  checksums_sha256.txt, dataset_inventory.csv, data_dictionary.csv
+docs/           see docs/README.md (drafts are not distributed here)
+CHANGELOG.md  CITATION.cff  DATA_SOURCES.md  METHODS.md  REVIEWER_GUIDE.md
+environment.yml / environment.lock.yml / renv.lock   (pinned environments)
+```
 
 ## Coordinate reference system
 

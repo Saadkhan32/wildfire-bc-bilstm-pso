@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software or data, please cite both the article and the archived release."
-title: "wildfire-bc-bilstm-pso: geospatial deep learning and SHAP-based explanation for wildfire susceptibility and exposure assessment in British Columbia"
+title: "wildfire-bc-bilstm-pso: code, data and metadata for an interpretable deep learning framework for wildfire susceptibility and exposure assessment in Western Canada"
 abstract: >-
   Reproducible pipeline, derived geospatial data, and ISO 19115-2 / CSVW metadata for a
   BiLSTM-PSO wildfire susceptibility and exposure framework for British Columbia, Canada
@@ -28,8 +28,6 @@ keywords:
   - ISO 19115-2
   - EPSG:3005
 authors:
-  # ORCIDs below verified against the published Zenodo record 10.5281/zenodo.20820293.
-  # AUTHOR INPUT REQUIRED: supply ORCIDs for Khan, Al-Mughrabi, Malekian, Esau and Uz Zaman.
   - family-names: Khan
     given-names: "Muhammad S."
     affiliation: "University of Prince Edward Island"
@@ -56,7 +54,7 @@ authors:
     affiliation: "Dalhousie University"
 preferred-citation:
   type: article
-  title: "Geospatial Deep Learning and SHAP-Based Explanation for Wildfire Susceptibility and Exposure Assessment in Western Canada"
+  title: "An Interpretable Deep Learning Framework for Wildfire Susceptibility and Exposure Assessment in Western Canada"
   journal: "Ecological Informatics"
   year: 2026
   authors:

@@ -90,3 +90,15 @@ _efffig/
 docs/manuscript_drafts_local/
 ~$*.docx
 *.sr.lock
+# auto-generated GIS sidecars (regenerable; authoritative metadata lives in metadata/iso19115/)
+*.shp.xml
+*.tif.xml
+*.sbn
+*.sbx
+*.ovr
+*.aux.xml
+tables/*_log.txt
+docs/*.docx
+FINISH_ZENODO_AND_GITHUB.ps1
+tables/TrendRegister_TheilSen_CI.csv
+tables/TrendAnalysis_TheilSen_CI_register.csv
