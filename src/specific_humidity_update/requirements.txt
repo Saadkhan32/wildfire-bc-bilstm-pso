@@ -1,0 +1,9 @@
+# Python dependencies for the specific-humidity figure/analysis scripts
+# Tested with Python 3.10-3.12.  Install with:  pip install -r requirements.txt
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+matplotlib>=3.7
+seaborn>=0.12        # Figure 12 only
+shap>=0.44           # Figure 17 only
+pillow>=10.0         # Figure 18 TIFF export

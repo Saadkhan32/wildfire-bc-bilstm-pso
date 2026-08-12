@@ -102,3 +102,8 @@ docs/*.docx
 FINISH_ZENODO_AND_GITHUB.ps1
 tables/TrendRegister_TheilSen_CI.csv
 tables/TrendAnalysis_TheilSen_CI_register.csv
+__pycache__/
+*.pyc
+REPRODUCIBILITY_REPORT.md
+src/.revision_step3_paths.json
+tables/T_fig5a_trend_methods.csv

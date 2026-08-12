@@ -1,26 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-c8c11_step4_collect_and_summarize.py  (Option C, all-4-models version)
-======================================================================
-STEP 4 of 5 -- Reviewer Comments 8 + 11.
-
-What this does:
-  Walks every (MODEL, threshold, seed) folder under 05_Model_Results,
-  reads metrics_summary.json + cv_oof_predictions.csv + best_params.json,
-  computes threshold metrics on OOF, and writes:
-
-      06_Final_Tables/all_model_sensitivity_results.xlsx
-      06_Final_Tables/random_seed_sensitivity_summary_clean.xlsx
-          mean +- SD per (model, threshold) across the 10 seeds
-      06_Final_Tables/threshold_sensitivity_seed42.xlsx
-          metric vs threshold at seed 42 (per model)
-      06_Final_Tables/cross_model_comparison.xlsx
-          headline AUC/F1 table: rows = models, cols = thresholds
-
-Run:
-    conda activate wildfire
-    python src/c8c11_step4_collect_and_summarize.py
-"""
 import os
 import sys
 import json
@@ -32,16 +9,13 @@ from sklearn.metrics import (roc_auc_score, average_precision_score,
                               accuracy_score, f1_score, precision_score,
                               recall_score, confusion_matrix,
                               brier_score_loss)
-
 MODELS = ["BiLSTM_PSO", "LSTM_PSO", "BiLSTM", "LSTM"]
 THRESHOLDS_HA = [70, 100, 200]
 SEEDS = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
-
 def pick_folder(title):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     p = filedialog.askdirectory(title=title)
     r.destroy(); return p
-
 def calc_metrics(y_true, y_prob, thr=0.5):
     y_true = np.asarray(y_true).astype(int)
     y_prob = np.asarray(y_prob).astype(float)
@@ -59,20 +33,16 @@ def calc_metrics(y_true, y_prob, thr=0.5):
         "oof_npv":         float(tn / (tn + fn)) if (tn + fn) > 0 else float("nan"),
         "tn": int(tn), "fp": int(fp), "fn": int(fn), "tp": int(tp),
     }
-
 print("=" * 60)
 print("STEP 4 / 5: Collect all-4-models results")
 print("=" * 60)
-
 print("\nDialog 1: pick 05_Model_Results")
 results_root = pick_folder("STEP 4: pick 05_Model_Results")
 if not results_root: sys.exit(1)
-
 print("\nDialog 2: pick 06_Final_Tables")
 final_dir = pick_folder("STEP 4: pick 06_Final_Tables")
 if not final_dir: sys.exit(1)
 os.makedirs(final_dir, exist_ok=True)
-
 rows = []
 missing = []
 for model in MODELS:
@@ -104,10 +74,8 @@ for model in MODELS:
                 row.update(calc_metrics(oof["y_true"].values,
                                         oof["y_pred_oof"].values, thr=0.5))
             rows.append(row)
-
 if not rows:
     print("No results found. Did STEP 3 produce anything?"); sys.exit(2)
-
 full = pd.DataFrame(rows)
 all_path = os.path.join(final_dir, "all_model_sensitivity_results.xlsx")
 full.to_excel(all_path, index=False)
@@ -120,15 +88,12 @@ if missing:
         by_model.setdefault(m, 0); by_model[m] += 1
     for m, n in by_model.items():
         print(f"    {m}: {n} missing")
-
 METRIC_COLS = [c for c in [
     "cv_mean_roc_auc", "cv_mean_pr_auc",
     "oof_roc_auc", "oof_pr_auc", "oof_brier",
     "oof_accuracy", "oof_f1", "oof_precision",
     "oof_sensitivity", "oof_specificity", "oof_npv",
 ] if c in full.columns]
-
-# ---- Clean summary: mean +- SD per (model, threshold) across 10 seeds ----
 clean_rows = []
 for (mdl, thr), g in full.groupby(["model", "threshold_ha"]):
     row = {"model": mdl, "threshold_ha": thr, "n_seeds": int(len(g))}
@@ -147,16 +112,12 @@ clean_path = os.path.join(final_dir, "random_seed_sensitivity_summary_clean.xlsx
 clean.to_excel(clean_path, index=False)
 clean.to_csv(clean_path.replace(".xlsx", ".csv"), index=False)
 print(f"[saved] {clean_path}")
-
-# ---- Threshold sensitivity at seed 42 (one row per (model, threshold)) ----
 seed42 = full[full["seed"] == 42].copy()
 if not seed42.empty:
     t_path = os.path.join(final_dir, "threshold_sensitivity_seed42.xlsx")
     seed42.to_excel(t_path, index=False)
     seed42.to_csv(t_path.replace(".xlsx", ".csv"), index=False)
     print(f"[saved] {t_path}")
-
-# ---- Cross-model comparison (headline table: rows=model, cols=threshold) ----
 if not clean.empty and "oof_roc_auc_meanSD" in clean.columns:
     pivot_auc = clean.pivot(index="model", columns="threshold_ha",
                             values="oof_roc_auc_meanSD")
@@ -167,23 +128,18 @@ if not clean.empty and "oof_roc_auc_meanSD" in clean.columns:
         pivot_auc.to_excel(xw, sheet_name="AUC_meanSD")
         pivot_f1.to_excel(xw,  sheet_name="F1_meanSD")
     print(f"[saved] {cmp_path}")
-
-# ---- Headline print ----
 print("\n" + "=" * 60)
 print("HEADLINE: across-seed mean +/- SD per (model, threshold)")
 print("=" * 60)
 print(clean[["model", "threshold_ha", "n_seeds",
              "oof_roc_auc_meanSD", "oof_pr_auc_meanSD",
              "oof_accuracy_meanSD", "oof_f1_meanSD"]].to_string(index=False))
-
 if not seed42.empty:
     print("\nThreshold-only effect at seed 42:")
     print(seed42[["model", "threshold_ha", "oof_roc_auc", "oof_pr_auc",
                   "oof_accuracy", "oof_f1"]].to_string(index=False))
-
 print("\nNext: run STEP 5 (assumption checks):")
 print("  python src/c8c11_step5_assumption_checks.py")
-
 try:
     a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
     messagebox.showinfo("STEP 4 done",

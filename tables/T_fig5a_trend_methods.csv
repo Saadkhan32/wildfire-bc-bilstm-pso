@@ -1,4 +1,0 @@
-method,slope_ha_per_year,intercept,p_value,ci95_lo,ci95_hi,test_statistic,notes
-OLS,46786.6,-9.37541e+07,0.0101751,14165.6,79407.7,0.514075,Assumes Gaussian residuals - sensitive to outliers
-Theil-Sen,9341.75,-1.86762e+07,0.0210654,343,45060.7,2.30681,"Non-parametric, robust to ~29% outliers; p-value from Mann-Kendall"
-Mann-Kendall,,,0.0210654,,,2.30681,"Tau=0.341, S=94.0, trend=increasing"

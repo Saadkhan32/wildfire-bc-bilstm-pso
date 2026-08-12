@@ -1,8 +1,0 @@
-{
-  "tables": "C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11/03_Training_Tables",
-  "bilstm_pso": "C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11/04_Model_Scripts/BiLSTM PSO FE.py",
-  "lstm_pso": "C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11/04_Model_Scripts/LSTM PSO FE.py",
-  "nonpso_cli": "C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/src/c8c11_non_pso_cli.py",
-  "parent_dir": "C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11",
-  "python_exe": "C:/Users/saadz/anaconda3/envs/wildfire/python.exe"
-}

@@ -1,7 +1,5 @@
-﻿"""src/seeds.py — centralised random-seed control."""
 import os, random
 import numpy as np
-
 SEEDS = {
     "nonfire_sampling": 42,
     "split":            2026,
@@ -9,7 +7,6 @@ SEEDS = {
     "tf":               1234,
     "pso":              99,
 }
-
 def set_all(name="tf"):
     if name not in SEEDS:
         raise KeyError(f"Unknown seed '{name}'. Keys: {sorted(SEEDS)}")
@@ -26,6 +23,5 @@ def set_all(name="tf"):
     except ModuleNotFoundError:
         pass
     return s
-
 if __name__ == "__main__":
     print(f"SEEDS = {SEEDS}")

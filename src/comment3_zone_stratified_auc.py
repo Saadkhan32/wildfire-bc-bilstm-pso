@@ -1,17 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-D3: comment3_zone_stratified_auc.py
-====================================
-BEC zone-stratified out-of-fold ROC-AUC and PR-AUC for the BiLSTM-PSO
-thr70 seed42 result. Answers Comment 3 sub-question 'what zone is to use?'.
-"""
 import os, json
 import numpy as np
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 from sklearn.metrics import roc_auc_score, average_precision_score
-
 REPO     = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso"
 COMBO    = "BiLSTM_PSO/thr70/seed42"
 OOF_CSV  = os.path.join(REPO, "revision_c8c11", "05_Model_Results",
@@ -22,20 +14,13 @@ BEC      = os.path.join(REPO, "revision_c8c11", "01_Input_Data",
                         "BEC_zones", "BEC_BIOGEOCLIMATIC_POLY", "BEC_POLY_polygon.shp")
 OUT_TBL  = os.path.join(REPO, "revision_c8c11", "06_Final_Tables")
 os.makedirs(OUT_TBL, exist_ok=True)
-
 print("=" * 70)
 print("D3: BEC zone-stratified OOF AUC for BiLSTM-PSO thr70 seed42")
 print("=" * 70)
-
-# Load OOF predictions
 oof = pd.read_csv(OOF_CSV)
 print(f"OOF rows: {len(oof)}")
-
-# Load training table to get lat/lon
 train = pd.read_csv(TRAIN_CSV)
 print(f"Training rows: {len(train)}")
-
-# Reattach lat/lon by row index
 if "Latitude" not in train.columns or "Longitude" not in train.columns:
     raise SystemExit("Training CSV missing Latitude/Longitude")
 oof = oof.merge(train[["Latitude","Longitude","Status"]].reset_index(),
@@ -43,8 +28,6 @@ oof = oof.merge(train[["Latitude","Longitude","Status"]].reset_index(),
                 suffixes=("","_train"))
 oof = oof.dropna(subset=["Latitude","Longitude","y_true","y_pred_oof"])
 print(f"After merge with lat/lon: {len(oof)}")
-
-# Spatial join with BEC zones
 print(f"Loading BEC zones: {BEC}")
 bec = gpd.read_file(BEC).to_crs("EPSG:4326")[["MAP_LABEL","ZONE","geometry"]]
 oof_gdf = gpd.GeoDataFrame(
@@ -54,12 +37,8 @@ oof_gdf = gpd.GeoDataFrame(
 joined = gpd.sjoin(oof_gdf, bec, how="left", predicate="within")
 joined["zone"] = joined["ZONE"].fillna("Unknown")
 print(f"Zones present: {sorted(joined['zone'].unique())}")
-
-# Group high-fire zones; lump the rest into 'Other'
 HIGH_FIRE = {"IDF", "PP", "ESSF", "SBS"}
 joined["zone_group"] = joined["zone"].where(joined["zone"].isin(HIGH_FIRE), "Other")
-
-# Per-zone AUC + bootstrap 95% CI
 def boot_auc(y_true, y_score, metric_fn, n_boot=1000, seed=42):
     rng = np.random.default_rng(seed)
     n = len(y_true)
@@ -71,7 +50,6 @@ def boot_auc(y_true, y_score, metric_fn, n_boot=1000, seed=42):
         except Exception: pass
     if not out: return (np.nan, np.nan)
     return (float(np.percentile(out, 2.5)), float(np.percentile(out, 97.5)))
-
 rows = []
 for zname, g in joined.groupby("zone_group"):
     y = g["y_true"].astype(int); s = g["y_pred_oof"].astype(float)
@@ -89,7 +67,6 @@ for zname, g in joined.groupby("zone_group"):
                  "OOF_PR_AUC":  round(pr,  4),
                  "OOF_PR_AUC_95CI_lo": round(pr_ci[0], 4),
                  "OOF_PR_AUC_95CI_hi": round(pr_ci[1], 4)})
-
 df = pd.DataFrame(rows).sort_values("n", ascending=False)
 out_csv = os.path.join(OUT_TBL, "T_C3_zone_stratified_AUC.csv")
 df.to_csv(out_csv, index=False)

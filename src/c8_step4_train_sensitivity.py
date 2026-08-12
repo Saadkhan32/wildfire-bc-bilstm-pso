@@ -1,24 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-c8_step4_train_sensitivity.py
-=============================
-STEP 4 of 5 -- Reviewer Comment 8 (random-seed sensitivity).
-
-What this does:
-  Loads each training_seed_<seed>.csv produced in STEP 3 and trains
-  LSTM + BiLSTM on each one. Saves per-seed metrics and a cross-seed
-  mean +/- SD summary.
-
-Why this matters for the reviewer:
-  This is the empirical reliability test. If model AUC SD across the
-  10 seeds is small (< 0.02), the rebuttal can claim that performance
-  is robust to which random pseudo-absence draw was used.
-
-How to run:
-    conda activate wildfire
-    cd C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso
-    python src\\c8_step4_train_sensitivity.py
-"""
 import os
 import sys
 import json
@@ -31,10 +10,8 @@ import pandas as pd
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Tuple, List, Optional, Dict
-
 warnings.filterwarnings("ignore", category=UserWarning)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -46,27 +23,21 @@ from sklearn.metrics import (roc_auc_score, average_precision_score, accuracy_sc
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, regularizers
 tf.get_logger().setLevel(logging.ERROR)
-
-# ---- Constants ----
 SEEDS = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
 TARGET_NAME = "Status"
 ASPECT_KEY  = "Aspect"
 TEST_SIZE   = 0.30
-
 EPOCHS = 30
 EARLYSTOP_PATIENCE = 8
 PLATEAU_PATIENCE   = 3
 MIN_LR = 1e-6
-
 RFE_KEEP_FRACTION = 0.60
 RFE_MIN_FEATURES  = 12
 RFE_N_ESTIMATORS  = 350
-
 USE_CLASS_WEIGHTS = "auto"
 BASE_HPS = {
     "lstm":   dict(units=256, layers=1, dropout=0.20, recurrent_drop=0.10, l2=1e-6,
@@ -77,19 +48,14 @@ BASE_HPS = {
 RUNS = ["lstm", "bilstm"]
 BOOTSTRAP_N    = 1000
 BOOTSTRAP_SEED = 42
-
-# ---- Tkinter pickers ----
 def pick_folder(title):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     p = filedialog.askdirectory(title=title)
     r.destroy(); return p
-
 def confirm(title, msg):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     a = messagebox.askyesno(title, msg)
     r.destroy(); return a
-
-# ---- Reproducibility ----
 def set_all_seeds(seed: int):
     random.seed(seed)
     np.random.seed(seed)
@@ -99,22 +65,17 @@ def set_all_seeds(seed: int):
     except AttributeError:
         pass
     os.environ["PYTHONHASHSEED"] = str(seed)
-
-# ---- Data ----
 def read_table(path):
     return pd.read_excel(path) if path.lower().endswith((".xlsx", ".xls")) else pd.read_csv(path)
-
 def add_aspect_sincos(df, col):
     a = pd.to_numeric(df[col], errors="coerce")
     rad = np.deg2rad(a % 360.0)
     df["Aspect_sin"] = np.sin(rad)
     df["Aspect_cos"] = np.cos(rad)
     return df.drop(columns=[col])
-
 def is_distance_like(col):
     lc = col.lower()
     return "distance" in lc or lc.startswith("dist") or "_dist" in lc
-
 def safe_log1p_inplace(df):
     for c in list(df.columns):
         if c == TARGET_NAME: continue
@@ -123,25 +84,20 @@ def safe_log1p_inplace(df):
             s[s < 0] = np.nan
             df[c] = np.log1p(s)
     return df
-
 def clean_nodata(df):
     df = df.dropna(subset=[TARGET_NAME]).copy()
     return df.replace([-9999, -99999, 9999, 99999], np.nan)
-
-# ---- Preprocessor + RFE ----
 def make_ohe():
     try:
         return OneHotEncoder(handle_unknown="ignore", sparse_output=False)
     except TypeError:
         return OneHotEncoder(handle_unknown="ignore", sparse=False)
-
 def build_preprocessor(X_df):
     cat = [c for c in X_df.columns if str(X_df[c].dtype) in ("object", "category")]
     num = [c for c in X_df.columns if c not in cat]
     np_ = Pipeline([("imp", SimpleImputer(strategy="median")), ("sc", StandardScaler())])
     cp_ = Pipeline([("imp", SimpleImputer(strategy="most_frequent")), ("ohe", make_ohe())])
     return ColumnTransformer([("num", np_, num), ("cat", cp_, cat)], remainder="drop")
-
 def get_feature_names(pre, X_df):
     try:
         return pre.get_feature_names_out(X_df.columns)
@@ -149,7 +105,6 @@ def get_feature_names(pre, X_df):
         Xt = pre.transform(X_df.iloc[:1])
         if hasattr(Xt, "toarray"): Xt = Xt.toarray()
         return np.array([f"f{i}" for i in range(Xt.shape[1])])
-
 def run_rfe(pre, X_tr, y_tr, seed):
     Xt = pre.transform(X_tr)
     if hasattr(Xt, "toarray"): Xt = Xt.toarray()
@@ -165,25 +120,20 @@ def run_rfe(pre, X_tr, y_tr, seed):
     rfe.fit(Xt, y_tr)
     mask = rfe.support_.astype(bool)
     return mask, names_all[mask]
-
 def transform_with_mask(pre, X_df, mask):
     X = pre.transform(X_df)
     if hasattr(X, "toarray"): X = X.toarray()
     return X[:, mask] if mask is not None else X
-
 def maybe_class_weights(y):
     p = float(np.mean(y == 1))
     if 0.45 <= p <= 0.55 and USE_CLASS_WEIGHTS == "auto":
         return None
     cw = compute_class_weight("balanced", classes=np.array([0, 1]), y=y)
     return {0: float(cw[0]), 1: float(cw[1])}
-
-# ---- Model ----
 try:
     register_ks = keras.saving.register_keras_serializable
 except Exception:
     register_ks = keras.utils.register_keras_serializable
-
 @register_ks(package="Wildfire")
 class AttentionPool1D(layers.Layer):
     def __init__(self, attn_units=128, **kwargs):
@@ -197,13 +147,11 @@ class AttentionPool1D(layers.Layer):
         return tf.reduce_sum(x * a, axis=1)
     def get_config(self):
         return {"attn_units": self.attn_units, **super().get_config()}
-
 def make_optimizer(lr):
     try:
         return keras.optimizers.AdamW(learning_rate=lr, weight_decay=1e-4, clipnorm=1.0)
     except Exception:
         return keras.optimizers.Adam(learning_rate=lr, clipnorm=1.0)
-
 def se_block(x, ratio=8):
     d = int(x.shape[-1])
     s = layers.GlobalAveragePooling1D()(x)
@@ -211,7 +159,6 @@ def se_block(x, ratio=8):
     s = layers.Dense(d, activation="sigmoid")(s)
     s = layers.Reshape((1, d))(s)
     return layers.Multiply()([x, s])
-
 def build_model(n_features, p, bidir):
     reg = regularizers.l2(p["l2"]) if p["l2"] > 0 else None
     inp = keras.Input(shape=(n_features,))
@@ -239,8 +186,6 @@ def build_model(n_features, p, bidir):
               loss=keras.losses.BinaryCrossentropy(label_smoothing=p["label_smooth"]),
               metrics=[keras.metrics.AUC(name="auc", curve="ROC")])
     return m
-
-# ---- Metrics ----
 def calc_metrics(y_true, y_prob, thr=0.5):
     y_pred = (y_prob >= thr).astype(int)
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
@@ -256,7 +201,6 @@ def calc_metrics(y_true, y_prob, thr=0.5):
         "NPV":         float(tn / (tn + fn)) if (tn + fn) > 0 else float("nan"),
         "TN": int(tn), "FP": int(fp), "FN": int(fn), "TP": int(tp),
     }
-
 def bootstrap_auc_ci(y_true, y_prob):
     rng = np.random.default_rng(BOOTSTRAP_SEED)
     n = len(y_true); aucs = []
@@ -266,8 +210,6 @@ def bootstrap_auc_ci(y_true, y_prob):
         if len(np.unique(yt)) < 2: continue
         aucs.append(roc_auc_score(yt, yp))
     return float(np.percentile(aucs, 2.5)), float(np.percentile(aucs, 97.5))
-
-# ---- Train one seed ----
 def train_one_seed(seed, data_path, out_root):
     set_all_seeds(seed)
     print(f"\n========== seed {seed}  |  {os.path.basename(data_path)} ==========")
@@ -279,7 +221,6 @@ def train_one_seed(seed, data_path, out_root):
     if TARGET_NAME not in df.columns:
         raise ValueError(f"'{TARGET_NAME}' not in {data_path}")
     y = pd.to_numeric(df[TARGET_NAME], errors="coerce").fillna(0).astype(int).values
-
     DROP_EXACT = {TARGET_NAME, "Longitude", "Latitude", "UniqueID",
                   "OBJECTID", "FID", "OID", "pointid", "CID", "CID_"}
     X = df.drop(columns=[c for c in df.columns if c in DROP_EXACT],
@@ -288,7 +229,6 @@ def train_one_seed(seed, data_path, out_root):
         X[c] = pd.to_numeric(X[c], errors="ignore")
     print(f"  rows={len(df)}  raw_features={len(X.columns)}  "
           f"fire={(y==1).sum()}  nonfire={(y==0).sum()}")
-
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=TEST_SIZE,
                                               random_state=seed, stratify=y)
     out = []
@@ -337,8 +277,6 @@ def train_one_seed(seed, data_path, out_root):
                       "y_pred": (y_prob >= 0.5).astype(int)}).to_csv(
             os.path.join(mdir, "holdout_predictions.csv"), index=False)
     return out
-
-# ---- Main ----
 def main():
     print("=" * 60)
     print("STEP 4 / 5: Random-seed sensitivity training")
@@ -350,8 +288,6 @@ def main():
     if not seed_dir:
         print("CANCELLED."); sys.exit(1)
     print(f"  seed tables: {seed_dir}")
-
-    # Check which seed CSVs are present
     found = []
     for s in SEEDS:
         f = os.path.join(seed_dir, f"training_seed_{s}.csv")
@@ -361,25 +297,21 @@ def main():
         print("Did you finish STEP 3?")
         sys.exit(2)
     print(f"  found {len(found)} / {len(SEEDS)} seed CSVs.")
-
     print("\nDialog 2 of 2: Pick Wildfire_C8\\03_Model_Results output folder")
     out_root = pick_folder("STEP 4 dialog 2: pick Wildfire_C8\\03_Model_Results")
     if not out_root:
         print("CANCELLED."); sys.exit(1)
     print(f"  output: {out_root}")
-
     if not confirm(
         "Ready to run STEP 4?",
         f"Will train LSTM + BiLSTM on {len(found)} seed datasets.\n\n"
         f"Total wall-time: ~{len(found) * 2 * 4} min on a single GPU.\n\nProceed?"
     ):
         sys.exit(0)
-
     os.makedirs(out_root, exist_ok=True)
     all_rows = []
     for s, p in found:
         all_rows.extend(train_one_seed(s, p, out_root))
-
     if not all_rows:
         print("No results produced."); return
     full = pd.DataFrame(all_rows)
@@ -387,7 +319,6 @@ def main():
                   index=False)
     full.to_csv(os.path.join(out_root, "random_seed_sensitivity_all_results.csv"),
                 index=False)
-
     METRICS = ["AUC", "AP", "Brier", "Accuracy", "F1",
                "Precision", "Sensitivity", "Specificity", "NPV"]
     rows = []
@@ -404,7 +335,6 @@ def main():
                      index=False)
     summary.to_csv(os.path.join(out_root, "random_seed_sensitivity_clean_summary.csv"),
                    index=False)
-
     print("\n" + "=" * 60)
     print("STEP 4 DONE.")
     print("=" * 60)
@@ -416,7 +346,6 @@ def main():
     print(summary[cols].to_string(index=False))
     print("\nNext: run STEP 5 to compute the three assumption checks:")
     print("  python src/c8_step5_assumption_checks.py")
-
     try:
         a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
         messagebox.showinfo(
@@ -426,6 +355,5 @@ def main():
         a.destroy()
     except Exception:
         pass
-
 if __name__ == "__main__":
     main()

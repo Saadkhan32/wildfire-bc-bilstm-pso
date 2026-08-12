@@ -1,20 +1,16 @@
-"""Phase F - ENSO + PDO ingestion (Comment 2) - corrected parsers."""
 from pathlib import Path
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt
 import geopandas as gpd
 from scipy.stats import pearsonr, spearmanr
-
 ROOT = Path(r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso")
 DATA_RAW = ROOT / "data" / "raw"
 DATA_PROC = ROOT / "data" / "processed"
 FIGS = ROOT / "figs"
 TABLES = ROOT / "tables"
 for d in (DATA_PROC, FIGS, TABLES): d.mkdir(parents=True, exist_ok=True)
-
-# ----- MEIv2 (wide: YEAR V1..V12 mapped to bimonthly windows) -----
 raw = (DATA_RAW / "meiv2.txt").read_text()
-m_map = {1:2, 2:3, 3:4, 4:5, 5:6, 6:7, 7:8, 8:9, 9:10, 10:11, 11:12, 12:1}  # bim slot -> rep. month
+m_map = {1:2, 2:3, 3:4, 4:5, 5:6, 6:7, 7:8, 8:9, 9:10, 10:11, 11:12, 12:1}  
 data = []
 for ln in raw.splitlines():
     parts = ln.split()
@@ -24,7 +20,7 @@ for ln in raw.splitlines():
             try:
                 v = float(parts[slot])
                 m = m_map[slot]
-                y = year + 1 if slot == 12 else year  # DJ wraps to next year January
+                y = year + 1 if slot == 12 else year  
                 if v == -999.0: v = np.nan
                 data.append((y, m, v))
             except ValueError:
@@ -32,8 +28,6 @@ for ln in raw.splitlines():
 mei = pd.DataFrame(data, columns=["year","month","mei"])
 mei = mei[(mei.year >= 2000) & (mei.year <= 2024)].sort_values(["year","month"]).reset_index(drop=True)
 print(f"MEI rows: {len(mei)}, range {mei.year.min()}-{mei.year.max()}")
-
-# ----- PDO (wide: YEAR V1..V12 monthly) -----
 raw = (DATA_RAW / "pdo.csv").read_text()
 rows = []
 for ln in raw.splitlines():
@@ -51,8 +45,6 @@ for ln in raw.splitlines():
 pdo = pd.DataFrame(rows, columns=["year","month","pdo"])
 pdo = pdo[(pdo.year >= 2000) & (pdo.year <= 2024)].sort_values(["year","month"]).reset_index(drop=True)
 print(f"PDO rows: {len(pdo)}, range {pdo.year.min()}-{pdo.year.max()}")
-
-# ----- Merge into monthly calendar + add lags -----
 cal = pd.MultiIndex.from_product([range(2000,2025), range(1,13)], names=["year","month"]).to_frame(index=False)
 tele = cal.merge(mei, on=["year","month"], how="left").merge(pdo, on=["year","month"], how="left")
 for lag in [3, 6, 9, 12]:
@@ -63,8 +55,6 @@ tele.to_csv(out, index=False)
 print(f"Wrote {out}  ({len(tele)} rows, {len(tele.columns)} cols)")
 print(f"  MEI coverage: {tele.mei.notna().sum()}/{len(tele)} months")
 print(f"  PDO coverage: {tele.pdo.notna().sum()}/{len(tele)} months")
-
-# ----- Plot -----
 tele["date"] = pd.to_datetime(dict(year=tele.year, month=tele.month, day=1))
 fig, axes = plt.subplots(2, 1, figsize=(11, 6), sharex=True)
 for ax, col, lbl, c in zip(axes, ["mei","pdo"], ["MEIv2","PDO"], ["#d7191c","#2c7bb6"]):
@@ -80,8 +70,6 @@ fig_out = FIGS / "S_enso_pdo_timeseries.png"
 plt.savefig(fig_out, dpi=300, bbox_inches="tight")
 plt.close()
 print(f"Wrote {fig_out}")
-
-# ----- Correlate with annual BC burned area -----
 fires = gpd.read_file(DATA_PROC / "fires_geq_70ha.shp")
 year_col = next((c for c in ("YEAR","YEAR_","FIRE_YEAR") if c in fires.columns), None)
 size_col = next((c for c in ("SIZE_HA","AREA_HA") if c in fires.columns), None)
@@ -89,7 +77,6 @@ print(f"Using fire-year column: {year_col}, size column: {size_col}")
 annual = fires.groupby(year_col)[size_col].sum().reset_index().rename(columns={year_col:"year", size_col:"burned_ha"})
 annual["year"] = annual["year"].astype(int)
 print(f"Annual fire records: {len(annual)} years, {annual.year.min()}-{annual.year.max()}")
-
 fs = tele[tele.month.isin([5,6,7,8,9])].groupby("year", as_index=False).agg(
     mei_fs_mean=("mei","mean"), pdo_fs_mean=("pdo","mean"))
 fs["year"] = fs["year"].astype(int)
@@ -97,7 +84,6 @@ joined = annual.merge(fs, on="year", how="inner")
 print(f"After merge: {len(joined)} years")
 joined_mei = joined.dropna(subset=["burned_ha","mei_fs_mean"])
 joined_pdo = joined.dropna(subset=["burned_ha","pdo_fs_mean"])
-
 corr_rows = []
 if len(joined_mei) >= 2:
     r, p = pearsonr(joined_mei["mei_fs_mean"], joined_mei["burned_ha"])
@@ -107,7 +93,6 @@ if len(joined_pdo) >= 2:
     r, p = pearsonr(joined_pdo["pdo_fs_mean"], joined_pdo["burned_ha"])
     rho, ps = spearmanr(joined_pdo["pdo_fs_mean"], joined_pdo["burned_ha"])
     corr_rows.append({"index":"pdo_fs_mean","pearson_r":round(r,4),"pearson_p":round(p,4),"spearman_rho":round(rho,4),"spearman_p":round(ps,4),"n":len(joined_pdo)})
-
 corr = pd.DataFrame(corr_rows)
 corr.to_csv(TABLES / "T_teleconnection_burnedarea_corr.csv", index=False)
 print("\nCorrelation results (annual BC burned area vs mean fire-season teleconnection):")

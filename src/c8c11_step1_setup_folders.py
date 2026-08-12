@@ -1,26 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-c8c11_step1_setup_folders.py
-============================
-STEP 1 of 5 -- Reviewer Comments 8 (random-seed sensitivity)
-                            + 11 (70 ha threshold sensitivity).
-
-What this does:
-  Asks you (with a folder picker) where to put all the C8+C11 working
-  files. Creates the six-folder layout and a config text file.
-
-Why this matters for the reviewer:
-  Comments 8 and 11 share the same data pipeline. We address them in one
-  workflow: 3 area thresholds (>=70, >=100, >=200 ha) x 10 random seeds
-  = 30 reproducible training datasets.
-
-Run this script anywhere (any Python env, no special packages):
-    python src/c8c11_step1_setup_folders.py
-"""
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-
 def main():
     print("=" * 60)
     print("STEP 1 / 5: Set up folder structure")
@@ -29,7 +9,6 @@ def main():
     print("A folder picker will open. Choose where to keep all the")
     print("C8 + C11 working files. Recommended: G:\\")
     print()
-
     root = tk.Tk(); root.withdraw(); root.attributes("-topmost", True)
     parent = filedialog.askdirectory(
         title="STEP 1: Pick a parent folder for the working files",
@@ -37,7 +16,6 @@ def main():
     root.destroy()
     if not parent:
         print("CANCELLED."); return
-
     base = os.path.join(parent, "Wildfire_Reviewer_Response")
     subdirs = [
         "01_Input_Data",
@@ -53,12 +31,10 @@ def main():
         d = os.path.join(base, s)
         os.makedirs(d, exist_ok=True)
         print(f"  OK   {d}")
-
     cfg = os.path.join(base, "c8c11_config.txt")
     with open(cfg, "w", encoding="utf-8") as f:
         f.write(base)
     print(f"\n[saved] base-path config: {cfg}")
-
     print()
     print("=" * 60)
     print("DONE with STEP 1.")
@@ -80,7 +56,6 @@ def main():
     print("  Distance_roads.tif, Distance_rivers.tif, Distance_households.tif")
     print()
     print("Then run STEP 2 in ArcGIS Pro Python window.")
-
     try:
         a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
         messagebox.showinfo(
@@ -91,6 +66,5 @@ def main():
         a.destroy()
     except Exception:
         pass
-
 if __name__ == "__main__":
     main()

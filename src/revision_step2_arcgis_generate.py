@@ -1,22 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-revision_step2_arcgis_generate.py
-=================================
-STEP 2 of 5 -- Reviewer Comments 8 + 11 (lean 12-run design).
-
-Generates 12 training CSVs (10 for seed-sensitivity at thr=70 ha,
-plus 2 extra for threshold-sensitivity at seed 42 with thr=100 and 200 ha)
-plus a sampling QC table that directly addresses Huettmann's reproducibility
-and sampling-design questions.
-
-Combinations produced:
-    (thr=70,  seed=42, 101, 202, 303, 404, 505, 606, 707, 808, 909)   -> 10 CSVs
-    (thr=100, seed=42)                                                -> 1 CSV
-    (thr=200, seed=42)                                                -> 1 CSV
-
-Run in ArcGIS Pro Python window:
-    exec(open(r"C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso\\src\\revision_step2_arcgis_generate.py").read())
-"""
 import os
 import sys
 import arcpy
@@ -24,21 +5,17 @@ import pandas as pd
 import numpy as np
 import tkinter as tk
 from tkinter import filedialog, messagebox
-
 arcpy.env.overwriteOutput = True
 arcpy.CheckOutExtension("Spatial")
-
-# ---- Design (lean 12-combination set) ----
 SEEDS_AT_THR70   = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
-THRESHOLDS_AT_S42 = [100, 200]       # thr 70 at seed 42 already covered above
+THRESHOLDS_AT_S42 = [100, 200]
 THR_MAIN = 70
 SEED_MAIN = 42
 START_YEAR, END_YEAR = 2000, 2024
 BUFFER_DISTANCE     = "20000 Meters"
 MIN_RANDOM_DISTANCE = "20000 Meters"
-PROJECTED_CRS = arcpy.SpatialReference(3005)   # BC Albers (meters)
-WGS84         = arcpy.SpatialReference(4326)   # exported lon/lat (deg)
-
+PROJECTED_CRS = arcpy.SpatialReference(3005)
+WGS84         = arcpy.SpatialReference(4326)
 PREDICTORS = [
     ("Aspect.tif",              "Aspect",              "continuous"),
     ("Slope.tif",               "Slope",               "continuous"),
@@ -63,29 +40,23 @@ YEAR_CANDIDATES   = ("YEAR", "YEAR_", "FIRE_YEAR", "YEAR_FIRE")
 AREA_CANDIDATES   = ("AREA_HA", "SIZE_HA", "POLY_HA", "HECTARES", "AREA")
 FIREID_CANDIDATES = ("NFDBFIREID", "FIRE_ID", "FIREID", "POLY_ID", "OBJECTID")
 AGENCY_CANDIDATES = ("SRC_AGENCY", "AGENCY", "SOURCE")
-
 def pick_file(t, ft, init=None):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     p = filedialog.askopenfilename(title=t, filetypes=ft, initialdir=init)
     r.destroy(); return p
-
 def pick_folder(t, init=None):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     p = filedialog.askdirectory(title=t, initialdir=init)
     r.destroy(); return p
-
 def confirm(t, m):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     a = messagebox.askyesno(t, m); r.destroy(); return a
-
 print("=" * 60)
 print("STEP 2 / 5: Generate 12 training CSVs + QC table")
 print("=" * 60)
 print(f"  10 seeds at thr={THR_MAIN} ha (Comment 8 random-seed sensitivity)")
 print(f"  3 thresholds at seed={SEED_MAIN} (Comment 11 threshold sensitivity)")
 print(f"  Total = {len(SEEDS_AT_THR70) + len(THRESHOLDS_AT_S42)} CSVs")
-
-# Dialogs
 print("\nDialog 1: pick BC boundary .shp")
 bc_shp = pick_file("STEP 2 dialog 1", [("Shapefile", "*.shp")])
 if not bc_shp: sys.exit(1)
@@ -101,8 +72,6 @@ if not gis_out: sys.exit(1)
 print("\nDialog 5: pick 03_Training_Tables folder")
 tables_folder = pick_folder("STEP 2 dialog 5")
 if not tables_folder: sys.exit(1)
-
-# Verify all 18 rasters
 predictor_paths = []
 missing = []
 for fname, col, kind in PREDICTORS:
@@ -113,27 +82,20 @@ if missing:
     print(f"\nERROR: missing rasters: {missing}")
     sys.exit(2)
 print(f"  All {len(predictor_paths)} rasters found.")
-
-# Build the (threshold, seed) plan
 combos = [(THR_MAIN, s) for s in SEEDS_AT_THR70]
 for thr in THRESHOLDS_AT_S42:
     combos.append((thr, SEED_MAIN))
-
 out_gdb = os.path.join(gis_out, "revision_sampling.gdb")
 if not arcpy.Exists(out_gdb):
     arcpy.management.CreateFileGDB(os.path.dirname(out_gdb), os.path.basename(out_gdb))
 arcpy.env.workspace = out_gdb
 arcpy.env.outputCoordinateSystem = PROJECTED_CRS
-
-# Project inputs to BC Albers
 bc_proj   = os.path.join(out_gdb, "bc_boundary_proj")
 fire_proj = os.path.join(out_gdb, "wildfire_input_proj")
 if not arcpy.Exists(bc_proj):
     arcpy.management.Project(bc_shp, bc_proj, PROJECTED_CRS)
 if not arcpy.Exists(fire_proj):
     arcpy.management.Project(fire_shp, fire_proj, PROJECTED_CRS)
-
-# Auto-detect field names
 fields = [f.name for f in arcpy.ListFields(fire_proj)]
 YEAR_F   = next((c for c in YEAR_CANDIDATES   if c in fields), None)
 AREA_F   = next((c for c in AREA_CANDIDATES   if c in fields), None)
@@ -142,15 +104,12 @@ AGENCY_F = next((c for c in AGENCY_CANDIDATES if c in fields), None)
 print(f"\nDetected: YEAR={YEAR_F}, AREA={AREA_F}, ID={ID_F}, AGENCY={AGENCY_F}")
 if YEAR_F is None or AREA_F is None:
     print(f"ERROR: need YEAR + AREA fields. Available: {fields}"); sys.exit(3)
-
 if not confirm("Ready?",
     f"Will generate {len(combos)} training CSVs in:\n{tables_folder}\n\n"
     "Wall-time ~30 min. Proceed?"):
     sys.exit(0)
-
 def delete_if_exists(p):
     if arcpy.Exists(p): arcpy.management.Delete(p)
-
 def build_sql(thr):
     y = arcpy.AddFieldDelimiters(out_gdb, YEAR_F)
     a = arcpy.AddFieldDelimiters(out_gdb, AREA_F)
@@ -159,8 +118,6 @@ def build_sql(thr):
         ag = arcpy.AddFieldDelimiters(out_gdb, AGENCY_F)
         parts.append(f"({ag} = 'BC' OR {ag} = 'PC')")
     return " AND ".join(parts)
-
-# Build wildfire layer and eligible non-fire area per threshold (cached)
 fire_layers   = {}
 eligible_diss = {}
 for thr in sorted(set([THR_MAIN] + THRESHOLDS_AT_S42)):
@@ -173,7 +130,6 @@ for thr in sorted(set([THR_MAIN] + THRESHOLDS_AT_S42)):
     elig_di  = os.path.join(out_gdb, f"eligible_area_diss_thr{thr}")
     for p in (selected, clipped, pts, buf, elig_raw, elig_di):
         delete_if_exists(p)
-
     lyr = "wfire_lyr_tmp"
     if arcpy.Exists(lyr): arcpy.management.Delete(lyr)
     arcpy.management.MakeFeatureLayer(fire_proj, lyr)
@@ -201,8 +157,6 @@ for thr in sorted(set([THR_MAIN] + THRESHOLDS_AT_S42)):
     arcpy.management.Dissolve(elig_raw, elig_di)
     fire_layers[thr]   = (pts, n_fire)
     eligible_diss[thr] = elig_di
-
-# Per-combination loop
 qc_rows = []
 for i, (thr, seed) in enumerate(combos, 1):
     print(f"\n----- combo {i}/{len(combos)}: thr={thr} seed={seed} -----")
@@ -226,8 +180,6 @@ for i, (thr, seed) in enumerate(combos, 1):
         arcpy.management.AddField(pseudo, "Status", "SHORT")
     arcpy.management.CalculateField(pseudo, "Status", 0, "PYTHON3")
     n_pseudo = int(arcpy.management.GetCount(pseudo)[0])
-
-    # QC distances
     nf = os.path.join(out_gdb, f"qc_nf_thr{thr}_seed{seed}")
     ns = os.path.join(out_gdb, f"qc_ns_thr{thr}_seed{seed}")
     for p in (nf, ns): delete_if_exists(p)
@@ -243,8 +195,6 @@ for i, (thr, seed) in enumerate(combos, 1):
     min_spacing = min(self_d) if self_d else float("nan")
     print(f"  n_pseudo={n_pseudo}  min_to_fire={min_to_fire:.0f} m  "
           f"min_spacing={min_spacing:.0f} m")
-
-    # Merge + UniqueID + extract predictors
     arcpy.management.Merge([fire_points, pseudo], merged)
     if "UniqueID" not in [f.name for f in arcpy.ListFields(merged)]:
         arcpy.management.AddField(merged, "UniqueID", "LONG")
@@ -255,8 +205,6 @@ for i, (thr, seed) in enumerate(combos, 1):
         arcpy.sa.ExtractMultiValuesToPoints(merged, cont, "BILINEAR")
     if cat:
         arcpy.sa.ExtractMultiValuesToPoints(merged, cat, "NONE")
-
-    # WGS84 lon/lat for PSO compute_block_ids
     if "Longitude" not in [f.name for f in arcpy.ListFields(merged)]:
         arcpy.management.AddField(merged, "Longitude", "DOUBLE")
     if "Latitude" not in [f.name for f in arcpy.ListFields(merged)]:
@@ -264,7 +212,6 @@ for i, (thr, seed) in enumerate(combos, 1):
     arcpy.management.CalculateGeometryAttributes(merged,
         [["Longitude", "POINT_X"], ["Latitude", "POINT_Y"]],
         coordinate_system=WGS84)
-
     out_csv = os.path.join(tables_folder, f"training_thr{thr}_seed{seed}.csv")
     cols = (["UniqueID", "Longitude", "Latitude", "Status"]
              + [c for _, c, _ in predictor_paths])
@@ -272,7 +219,6 @@ for i, (thr, seed) in enumerate(combos, 1):
     pd.DataFrame(rows, columns=cols).dropna(subset=["Status"]).to_csv(
         out_csv, index=False)
     print(f"  wrote {out_csv}")
-
     qc_rows.append({
         "threshold_ha":                  thr,
         "seed":                          seed,
@@ -286,10 +232,8 @@ for i, (thr, seed) in enumerate(combos, 1):
         "passed_20km_pseudo_spacing":    bool(np.isnan(min_spacing) or min_spacing >= 20000),
         "training_csv":                  out_csv,
     })
-
 qc_csv = os.path.join(tables_folder, "sampling_QC_summary.csv")
 pd.DataFrame(qc_rows).to_csv(qc_csv, index=False)
-
 print("\n" + "=" * 60)
 print("STEP 2 DONE.")
 print("=" * 60)
@@ -298,7 +242,6 @@ print(f"  QC summary:                    {qc_csv}")
 print("\nNext: STEP 3 (run BiLSTM-PSO 12 times):")
 print("  conda activate wildfire")
 print("  python src/revision_step3_run_bilstm_pso.py")
-
 try:
     a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
     messagebox.showinfo("STEP 2 complete",

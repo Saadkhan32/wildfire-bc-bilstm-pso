@@ -1,44 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-revision_step3_run_bilstm_pso.py
-================================
-STEP 3 of 5 -- Reviewer Comments 8 + 11 (lean 12-run design).
-
-Runs your BiLSTM PSO FE.py 12 times:
-    (thr=70,  seed=42, 101, 202, 303, 404, 505, 606, 707, 808, 909)
-    (thr=100, seed=42)
-    (thr=200, seed=42)
-
-Output layout (for STEP 4 collector):
-    05_Model_Results/thr<H>/seed<S>/metrics_summary.json
-                                    cv_oof_predictions.csv
-                                    cv_metrics_10fold.csv
-                                    best_params.json
-                                    final_model.keras
-                                    selected_features_final.csv
-                                    static_preprocessor.joblib
-
-Resumable: re-run anytime; folders already containing
-metrics_summary.json are skipped.
-
-Run:
-    conda activate wildfire
-    python src/revision_step3_run_bilstm_pso.py
-"""
 import os
 import sys
 import time
 import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
-
-# Design (matches STEP 2)
 SEEDS_AT_THR70    = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
 THRESHOLDS_AT_S42 = [100, 200]
 THR_MAIN          = 70
 SEED_MAIN         = 42
-
-# PSO budget (matches your published settings)
 OBJECTIVE      = "roc"
 GRID_KM        = 50
 PROGRESS       = "none"
@@ -48,50 +17,38 @@ PSO_FOLDS      = 2
 SEARCH_EPOCHS  = 30
 RETRAIN_EPOCHS = 30
 FORCE_RERUN    = False
-
 def pick_file(t, ft):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     p = filedialog.askopenfilename(title=t, filetypes=ft)
     r.destroy(); return p
-
 def pick_folder(t):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     p = filedialog.askdirectory(title=t)
     r.destroy(); return p
-
 def confirm(t, m):
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True)
     a = messagebox.askyesno(t, m); r.destroy(); return a
-
 print("=" * 60)
 print("STEP 3 / 5: Run BiLSTM-PSO 12 times")
 print("=" * 60)
-
 print("\nDialog 1: pick 03_Training_Tables folder")
 tables_folder = pick_folder("STEP 3 dialog 1")
 if not tables_folder: sys.exit(1)
-
 print("\nDialog 2: pick 'BiLSTM PSO FE.py' (your PSO training script)")
 pso_script = pick_file("STEP 3 dialog 2", [("Python", "*.py")])
 if not pso_script: sys.exit(1)
-
 print("\nDialog 3: pick 05_Model_Results folder")
 out_root = pick_folder("STEP 3 dialog 3")
 if not out_root: sys.exit(1)
-
 print("\nDialog 4: pick python.exe of the wildfire conda env")
 python_exe = pick_file("STEP 3 dialog 4",
     [("Executable", "python.exe"), ("All", "*.*")])
 if not python_exe:
     python_exe = sys.executable
     print(f"  fallback to sys.executable: {python_exe}")
-
-# Build the 12-combination plan
 combos = [(THR_MAIN, s) for s in SEEDS_AT_THR70]
 for thr in THRESHOLDS_AT_S42:
     combos.append((thr, SEED_MAIN))
-
-# Verify training CSVs exist + count what's still to run
 plan = []
 missing_csv = []
 for thr, s in combos:
@@ -100,20 +57,17 @@ for thr, s in combos:
         plan.append((thr, s, csv))
     else:
         missing_csv.append((thr, s, csv))
-
 if missing_csv:
     print("\nERROR: missing training CSVs from STEP 2:")
     for thr, s, p in missing_csv:
         print(f"  - thr{thr} seed{s}: {p}")
     sys.exit(2)
-
 remaining = []
 for thr, s, csv in plan:
     od = os.path.join(out_root, f"thr{thr}", f"seed{s}")
     sj = os.path.join(od, "metrics_summary.json")
     if FORCE_RERUN or not os.path.exists(sj):
         remaining.append((thr, s, csv, od))
-
 print(f"\nPlan: {len(plan)} runs total, {len(remaining)} remaining.")
 est_h = len(remaining) * 45 / 60
 if not confirm("Ready?",
@@ -121,7 +75,6 @@ if not confirm("Ready?",
     f"Wall-time estimate: ~{est_h:.1f} hours.\n"
     f"Resumable; you can stop and restart.\n\nProceed?"):
     sys.exit(0)
-
 t_total = time.time()
 ok = 0; fail = 0
 for i, (thr, s, csv, od) in enumerate(remaining, 1):
@@ -149,7 +102,6 @@ for i, (thr, s, csv, od) in enumerate(remaining, 1):
     else:
         print(f"  FAILED in {dt:.1f} min. See {log}")
         fail += 1
-
 print("\n" + "=" * 60)
 print(f"STEP 3 finished in {(time.time()-t_total)/3600:.1f} hours.")
 print(f"  successes: {ok}")
@@ -157,7 +109,6 @@ print(f"  failures:  {fail}")
 print("=" * 60)
 print("\nNext: STEP 4 (collect + summarize):")
 print("  python src/revision_step4_summarize.py")
-
 try:
     a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
     messagebox.showinfo("STEP 3 done", f"ok: {ok}\nfail: {fail}")

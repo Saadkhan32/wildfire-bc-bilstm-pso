@@ -1,19 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Closes Reviewer Comment 12 (monthly-aggregate) + Comment 16 (95% CIs on Fig 11).
-
-Inputs (auto-detected at the multi-file picker):
-  - 3 TerraClimate long-form CSVs (AET, PDSI, SOIL) - covers 2000-2024
-  - 1 wide-form CSV (e.g., BC_2000_2024_monthly_climate_wide.csv from GEE)
-    OR xlsx with year/month + climate variable columns
-  Auto-detection picks the right branch for each file.
-
-Smart hybrid 2024 handling:
-  - For each variable, compares 2024 mean to clim_window monthly climatology mean
-  - If |2024_mean| / |clim_mean| is within [0.5, 2.0]: provided values used
-  - Otherwise: 2024 overwritten with climatology (treats as unit/scale mismatch)
-  - If no scale mismatch and full data present: no infill done
-"""
 import os
 import sys
 import math
@@ -30,9 +14,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 from scipy import stats as sps
-
-
-# ── Style: Times New Roman everywhere ────────────────────────────────────
 TNR_RC = {
     "font.family":          "Times New Roman",
     "font.serif":           ["Times New Roman", "Times", "serif"],
@@ -57,11 +38,9 @@ sns.set_style("whitegrid")
 sns.set_palette("colorblind")
 GRID_KW = dict(color="grey", linewidth=0.5, alpha=0.3)
 WILDFIRE_MONTHS = {5: "May", 6: "June", 7: "July", 8: "August"}
-
 VARIABLE_RENAME = {
     "avg_relative_humidity": "relative_humidity",
 }
-
 UNIT_MAP = {
     "AET":                  "mm/month",
     "PDSI":                 "unitless",
@@ -73,7 +52,6 @@ UNIT_MAP = {
     "relative_humidity":    "%",
     "precipitation":        "mm",
 }
-
 PRETTY_NAME = {
     "AET":                  "Evapotranspiration (mm/mo)",
     "PDSI":                 "Palmer Drought Severity Index",
@@ -85,46 +63,33 @@ PRETTY_NAME = {
     "relative_humidity":    "Relative humidity (%)",
     "precipitation":        "Precipitation (mm)",
 }
-
 COMPOSITE_GROUPS = [
     ("temperature",  ["max_temperature", "avg_temperature", "min_temperature"]),
     ("hydrology",    ["AET",             "precipitation",   "soil_moisture"]),
     ("atmospheric",  ["relative_humidity","avg_wind_speed", "PDSI"]),
 ]
-
-
-# ── Number formatters ───────────────────────────────────────────────────
 def fmt_p(p, decimals=3):
     if p is None or (isinstance(p, float) and np.isnan(p)): return ""
     if p < 0.0001: return "<0.0001"
     if p < 0.001:  return f"{p:.4f}"
     return f"{p:.{decimals}f}"
-
-
 def fmt_num(v, decimals=2):
     if v is None or (isinstance(v, float) and np.isnan(v)): return ""
     if abs(v) >= 1000: return f"{v:,.0f}"
     if abs(v) >= 100:  return f"{v:.1f}"
     return f"{v:.{decimals}f}"
-
-
 def stars_for_q(q):
     if q is None or (isinstance(q, float) and np.isnan(q)): return "n.s."
     if q < 0.001: return "***"
     if q < 0.01:  return "**"
     if q < 0.05:  return "*"
     return "n.s."
-
-
-# ── Tkinter pickers ───────────────────────────────────────────────────
 _TK = None
 def _tk():
     global _TK
     if _TK is None:
         _TK = tk.Tk(); _TK.withdraw()
     return _TK
-
-
 def pick_merged_or_files():
     _tk()
     choice = messagebox.askyesno(
@@ -144,8 +109,6 @@ def pick_merged_or_files():
         filetypes=[("Data files", "*.csv *.xlsx *.xls")],
     )
     return ("raw", [Path(p) for p in paths] if paths else None)
-
-
 def pick_project_root():
     _tk()
     p = filedialog.askdirectory(
@@ -153,12 +116,7 @@ def pick_project_root():
         initialdir=r"C:\Users\saadz\Documents",
     )
     return Path(p) if p else None
-
-
-# ── Auto-detecting re-merge ────────────────────────────────────────────
 def remerge(paths):
-    """Auto-detects: TerraClimate long-form CSV (has 'mean' + 'variable'),
-       wide-form xlsx, or wide-form CSV (e.g., GEE wide export)."""
     parts = []
     for p in paths:
         if p.suffix.lower() in (".xls", ".xlsx"):
@@ -185,7 +143,6 @@ def remerge(paths):
                       f"cols={[c for c in df.columns if c not in ('year','month')]}")
             else:
                 print(f"  [WARN] unknown CSV format: {p.name}")
-
     wide_groups = {}
     for kind, df, name in parts:
         if kind != "wide":
@@ -200,7 +157,6 @@ def remerge(paths):
             wide_combined.append(stacked)
         else:
             wide_combined.append(group[0])
-
     terra_parts = [df for kind, df, _ in parts if kind == "terra"]
     merged = None
     for part in terra_parts + wide_combined:
@@ -209,25 +165,15 @@ def remerge(paths):
                                                      how="outer")
     merged = merged.rename(columns=VARIABLE_RENAME)
     return merged.sort_values(["year", "month"]).reset_index(drop=True)
-
-
-# ── Smart hybrid 2024 infill ─────────────────────────────────────────
 def infill_recent_year(df, target_year=None, clim_window=(2014, 2023),
                        scale_lo=0.5, scale_hi=2.0):
-    """For target year:
-       - missing variables -> infilled from clim_window monthly climatology
-       - present variables whose |mean| ratio to climatology is outside
-         [scale_lo, scale_hi] -> overwritten with climatology
-       Returns (df, missing_list, scale_mismatch_list)."""
     if target_year is None:
         target_year = int(df["year"].max())
     num_cols = [c for c in df.columns if c not in ("year", "month")
                 and pd.api.types.is_numeric_dtype(df[c])]
-
     missing = []
     scale_mismatch = []
     target_present = target_year in set(df["year"].astype(int).tolist())
-
     for var in num_cols:
         target_vals = (df.loc[df["year"] == target_year, var].dropna()
                        if target_present else pd.Series(dtype=float))
@@ -267,9 +213,6 @@ def infill_recent_year(df, target_year=None, clim_window=(2014, 2023),
             scale_mismatch.append(var)
     df = df.sort_values(["year", "month"]).reset_index(drop=True)
     return df, missing, scale_mismatch
-
-
-# ── Effect sizes ─────────────────────────────────────────────────────
 def cohens_d(x, y):
     x = np.asarray(x, dtype=float); y = np.asarray(y, dtype=float)
     x = x[~np.isnan(x)]; y = y[~np.isnan(y)]
@@ -279,8 +222,6 @@ def cohens_d(x, y):
     sp = math.sqrt(((nx - 1) * vx + (ny - 1) * vy) / (nx + ny - 2))
     if sp == 0: return np.nan
     return (x.mean() - y.mean()) / sp
-
-
 def cliffs_delta(x, y):
     x = np.asarray(x, dtype=float); y = np.asarray(y, dtype=float)
     x = x[~np.isnan(x)]; y = y[~np.isnan(y)]
@@ -291,24 +232,18 @@ def cliffs_delta(x, y):
     rank_x = ranks[:nx].sum()
     U = rank_x - nx * (nx + 1) / 2
     return float((2 * U) / (nx * ny) - 1)
-
-
 def cohens_d_mag(d):
     a = abs(d) if not np.isnan(d) else 0
     if a < 0.2: return "negligible"
     if a < 0.5: return "small"
     if a < 0.8: return "medium"
     return "large"
-
-
 def cliffs_delta_mag(d):
     a = abs(d) if not np.isnan(d) else 0
     if a < 0.147: return "negligible"
     if a < 0.33:  return "small"
     if a < 0.474: return "medium"
     return "large"
-
-
 def benjamini_hochberg(pvals, alpha=0.05):
     p = np.asarray(pvals, dtype=float)
     n = len(p)
@@ -320,8 +255,6 @@ def benjamini_hochberg(pvals, alpha=0.05):
     q_ranked = np.minimum(q_ranked, 1.0)
     q = np.empty(n); q[order] = q_ranked
     return q, q < alpha
-
-
 def mean_ci95(x):
     x = np.asarray(x, dtype=float); x = x[~np.isnan(x)]
     n = len(x)
@@ -329,9 +262,6 @@ def mean_ci95(x):
     m = x.mean(); se = x.std(ddof=1) / math.sqrt(n)
     t_crit = sps.t.ppf(0.975, df=n - 1)
     return m, t_crit * se
-
-
-# ── Per-variable stats ───────────────────────────────────────────────
 def variable_stats(df, var):
     sub = df[["year", "month", var]].dropna().copy()
     if sub.empty: return None
@@ -362,9 +292,6 @@ def variable_stats(df, var):
         "cohens_d": float(d), "cohens_d_mag": cohens_d_mag(d),
         "cliffs_delta": float(cdelta), "cliffs_delta_mag": cliffs_delta_mag(cdelta),
     }
-
-
-# ── Shared panel renderer ────────────────────────────────────────────
 def _render_panels(df, var, row, ax_ts, ax_box, small=False):
     sub = df[["year", "month", var]].dropna().copy()
     if sub.empty: return
@@ -373,7 +300,6 @@ def _render_panels(df, var, row, ax_ts, ax_box, small=False):
                              "Wildfire Season", "Non-Wildfire Season")
     unit = UNIT_MAP.get(var, "")
     y_label = f"{var.replace('_',' ').title()}{' (' + unit + ')' if unit else ''}"
-
     ts_label_fs   = 10 if small else 12
     ts_tick_fs    = 9  if small else 11
     box_tick_fs   = 9  if small else 10
@@ -382,12 +308,10 @@ def _render_panels(df, var, row, ax_ts, ax_box, small=False):
     stars_fs      = 12 if small else 14
     marker_size   = 4  if small else 6
     line_w        = 1.4 if small else 2.0
-
     df_line = sub[sub["MonthName"].notna()].copy()
     years = (np.sort(df_line["year"].unique()) if not df_line.empty
              else np.sort(sub["year"].unique()))
     xticks = years[::max(1, len(years)//8 or 1)]
-
     ax_ts.grid(**GRID_KW)
     if not df_line.empty:
         sns.lineplot(data=df_line, x="year", y=var, hue="MonthName",
@@ -407,7 +331,6 @@ def _render_panels(df, var, row, ax_ts, ax_box, small=False):
     ax_ts.set_xticks(xticks)
     ax_ts.set_xticklabels(xticks, rotation=45, weight="bold", fontsize=ts_tick_fs)
     sns.despine(ax=ax_ts)
-
     ax_box.grid(**GRID_KW)
     sns.boxplot(
         data=sub, x="season", y=var, hue="season",
@@ -438,13 +361,11 @@ def _render_panels(df, var, row, ax_ts, ax_box, small=False):
                             textcoords="offset points", fontsize=mean_text_fs,
                             fontweight="bold")
     ax_box.set_title(""); ax_box.set_xlabel(""); ax_box.set_ylabel("")
-
     overall_min = float(np.nanmin(sub[var].values))
     overall_max = float(np.nanmax(sub[var].values))
     span = overall_max - overall_min or 1.0
     ax_box.set_ylim(overall_min - 0.04 * span, overall_max + 0.20 * span)
     sns.despine(ax=ax_box)
-
     q_w = row.get("welch_q_BH", np.nan)
     stars = stars_for_q(q_w)
     y_bracket = overall_max + 0.08 * span
@@ -460,8 +381,6 @@ def _render_panels(df, var, row, ax_ts, ax_box, small=False):
         ["Non-Wildfire\nSeason", "Wildfire\nSeason"],
         fontweight="bold", fontsize=box_tick_fs,
     )
-
-
 def _add_mk_trend(ax, x, y, fontsize=10):
     x = np.asarray(x, dtype=float); y = np.asarray(y, dtype=float)
     mask = np.isfinite(x) & np.isfinite(y)
@@ -497,9 +416,6 @@ def _add_mk_trend(ax, x, y, fontsize=10):
             transform=ax.transAxes, ha="center", va="bottom",
             fontsize=fontsize, fontweight="bold",
             bbox=dict(facecolor="white", edgecolor="none", alpha=0.8), zorder=4)
-
-
-# ── Single-variable figure ───────────────────────────────────────────
 def plot_variable_v2(df, row, out_folder):
     var = row["variable"]
     fig, (ax_ts, ax_box) = plt.subplots(
@@ -514,9 +430,6 @@ def plot_variable_v2(df, row, out_folder):
                     dpi=(300 if ext == "png" else None))
     plt.close(fig)
     print(f"  [FIG] {var}.{{svg,pdf,png}}")
-
-
-# ── Composite 3-panel figure ─────────────────────────────────────────
 def build_composite_figure(df, stats_df, group_name, var_list, out_folder):
     fig = plt.figure(figsize=(7.5, 9.5))
     fig.suptitle(
@@ -538,7 +451,6 @@ def build_composite_figure(df, stats_df, group_name, var_list, out_folder):
         ax_ts = fig.add_subplot(gs[i, 0])
         ax_box = fig.add_subplot(gs[i, 1])
         _render_panels(df, var, row, ax_ts, ax_box, small=True)
-
     base = os.path.join(out_folder, f"Fig11_{group_name}")
     fig.savefig(f"{base}.png", bbox_inches="tight", dpi=300)
     fig.savefig(f"{base}.jpg", bbox_inches="tight", dpi=300,
@@ -546,9 +458,6 @@ def build_composite_figure(df, stats_df, group_name, var_list, out_folder):
     fig.savefig(f"{base}.pdf", bbox_inches="tight")
     plt.close(fig)
     print(f"  [COMPOSITE] Fig11_{group_name}.{{png,jpg,pdf}}")
-
-
-# ── Two-row horizontal legend ────────────────────────────────────────
 def build_legend_figure(out_folder):
     palette = sns.color_palette("colorblind", 4)
     row0 = [
@@ -578,7 +487,6 @@ def build_legend_figure(out_folder):
     handles = []
     for h0, h1 in zip(row0, row1):
         handles.append(h0); handles.append(h1)
-
     fig, ax = plt.subplots(figsize=(12, 1.5))
     ax.set_axis_off()
     leg = ax.legend(
@@ -599,9 +507,6 @@ def build_legend_figure(out_folder):
     fig.savefig(f"{base}.svg", bbox_inches="tight")
     plt.close(fig)
     print(f"  [LEGEND] Fig11_legend.{{png,jpg,pdf,svg}}")
-
-
-# ── Publication-formatted table writer ───────────────────────────────
 def write_publication_table(stats_df, out_tables):
     rows = []
     for _, r in stats_df.iterrows():
@@ -631,7 +536,6 @@ def write_publication_table(stats_df, out_tables):
     csv_path = out_tables / "T_climate_stats_publication.csv"
     pub.to_csv(csv_path, index=False)
     print(f" [PUBLICATION CSV] -> {csv_path}")
-
     html_path = out_tables / "T_climate_stats_publication.html"
     css = """
     <style>
@@ -673,15 +577,11 @@ def write_publication_table(stats_df, out_tables):
                 f"<body><h2>Climate seasonal contrasts — publication table</h2>"
                 f"{html_table}</body></html>")
     print(f" [PUBLICATION HTML] -> {html_path}")
-
-
-# ── Main ─────────────────────────────────────────────────────────────
 def main():
     print("=" * 75)
     print(" Climate Stats - FULL battery for Comment 12 (monthly-aggregate)")
     print(f" Started: {datetime.now():%Y-%m-%d %H:%M:%S}")
     print("=" * 75)
-
     mode, picks = pick_merged_or_files()
     if not picks:
         print("No files picked. Exiting."); return 1
@@ -692,9 +592,6 @@ def main():
     else:
         df = remerge(picks)
         print(f" re-merged {len(picks)} files: shape {df.shape}")
-
-    # Smart hybrid infill: only kicks in if some 2024 variables are missing
-    # or have a scale-mismatched mean vs 2014-2023 climatology
     df, infilled_missing, infilled_scale = infill_recent_year(
         df, clim_window=(2014, 2023), scale_lo=0.5, scale_hi=2.0)
     target_year = int(df["year"].max())
@@ -707,7 +604,6 @@ def main():
         print(f"                  replaced with 2014-2023 monthly climatology")
     if not infilled_missing and not infilled_scale:
         print(f" [INFILL] not needed - {target_year} fully populated and scale-matched")
-
     root = pick_project_root()
     if not root:
         print("No project root selected. Exiting."); return 1
@@ -731,13 +627,10 @@ def main():
     out["mw_sig_q05"] = out["mw_q_BH"] < 0.05
     out["abs_cliffs"] = out["cliffs_delta"].abs()
     out = out.sort_values("abs_cliffs", ascending=False).drop(columns="abs_cliffs")
-
     raw_csv = out_tables / "T_climate_stats_full.csv"
     out.to_csv(raw_csv, index=False, float_format="%.6g")
     print(f"\n [RAW CSV] -> {raw_csv}")
-
     write_publication_table(out, out_tables)
-
     print("\n Summary (top of table):")
     print(out[["variable", "n_wildfire", "n_nonwildfire",
                "shapiro_p_wild", "shapiro_p_nonfire", "levene_p",
@@ -745,18 +638,14 @@ def main():
                "cohens_d", "cohens_d_mag",
                "cliffs_delta", "cliffs_delta_mag"]
               ].to_string(index=False))
-
     print(f"\n Single-variable figures -> {out_figs} ...")
     for _, row in out.iterrows():
         plot_variable_v2(df, row.to_dict(), str(out_figs))
-
     print(f"\n Composite 3-panel figures (one Word page each) -> {out_figs} ...")
     for group_name, var_list in COMPOSITE_GROUPS:
         build_composite_figure(df, out, group_name, var_list, str(out_figs))
-
     print(f"\n Two-row horizontal legend -> {out_figs} ...")
     build_legend_figure(str(out_figs))
-
     print("\n" + "=" * 75)
     print(f" DONE.")
     print(f"   Raw CSV:           {raw_csv}")
@@ -766,7 +655,6 @@ def main():
     print(f"   Composite figs:    {out_figs}  (3 page-sized PNG+JPG+PDF)")
     print(f"   2-row legend:      {out_figs / 'Fig11_legend.png'}")
     print("=" * 75)
-
     try:
         _tk()
         messagebox.showinfo(
@@ -776,7 +664,5 @@ def main():
     except Exception:
         pass
     return 0
-
-
 if __name__ == "__main__":
     sys.exit(main())

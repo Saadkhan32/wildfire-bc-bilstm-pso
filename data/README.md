@@ -14,7 +14,7 @@ same layout. Every dataset group has an ISO 19115-2 record in
 | `processed/BC_ge70ha_annual_2000_2024.csv` | Annual ≥70 ha fire count and area burned (trend analysis) | `bc-fire-perimeters` | derived from CWFIS, CC-BY 4.0 |
 | `rasters/` *(Zenodo)* | 19 conditioning-factor rasters, 1.5 km grid | `predictor-rasters-bc` | see `../DATA_SOURCES.md` per layer |
 | `susceptibility/` *(Zenodo)* | Per-model susceptibility surfaces + 5-class maps | `susceptibility-maps-bc` | author-generated, CC-BY 4.0 |
-| `climate/` *(Zenodo)* | Monthly provincial climate series 2000–2024 | `predictor-rasters-bc` | TerraClimate (CC0), ERA5-Land (Copernicus) |
+| `BC_*_2000_2024.csv` (tracked here) and `climate/` *(Zenodo)* | Monthly provincial climate series 2000–2024 (temperature, wind, humidity, precipitation, AET, PDSI, soil moisture, specific humidity) | `predictor-rasters-bc` | TerraClimate (CC0), ERA5-Land (Copernicus) |
 | `cross_border_US/` *(Zenodo)* | 49th-parallel strips, US FSim + FPA-FOD extracts | `us-fsim-burn-probability`, `us-fpa-fod-fires` | USDA-FS / USGS, public domain |
 | `raw/` *(Zenodo)* | Inputs as downloaded + provider README | per-source records | see `../DATA_SOURCES.md` |
 

@@ -1,45 +1,16 @@
-"""day2_automation.py - Full ArcPy automation of Day 2 GIS work
-
-INTERACTIVE: opens tkinter file/folder pickers so you don't have to edit paths.
-
-How to run in ArcGIS Pro:
-    Analysis tab -> Python  (opens the Python pane at the bottom)
-    Paste:
-        exec(open(r"C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso\\src\\day2_automation.py").read())
-
-What it does
-------------
-PHASE C   Reproject all 18 UTM-12N rasters + CWFIS NFDB perimeters to EPSG:3005
-PHASE D   Compute AREA_HA, filter to BC + 2000-2024, export fires_geq_{50,70,100}ha
-PHASE E   Fire centroids, sample 18 predictors, Moran's I per predictor, LISA top-4
-PHASE F   (Manual) ENSO/PDO ingestion and Geary's C - not part of this script,
-          script prints the exact commands at the end.
-
-Reviewer comments covered: 7 (FAIR audit), 9 (BC projection), 10 (Moran's I + LISA),
-                           11 (threshold sensitivity), partial 2 (ENSO printed at end)
-"""
-
 from __future__ import annotations
-
 import csv
 import os
 import sys
 import time
 import traceback
-
-# ----------------------------------------------------------------------
-# Tkinter file/folder pickers
-# ----------------------------------------------------------------------
 try:
     import tkinter as tk
     from tkinter import filedialog, messagebox
     HAS_TK = True
 except ImportError:
     HAS_TK = False
-
-
 def pick_folder(title: str, initialdir: str | None = None) -> str:
-    """Open a folder picker dialog. Returns the selected path or '' if cancelled."""
     if not HAS_TK:
         return input(f"{title} (paste path): ").strip().strip('"')
     root = tk.Tk()
@@ -48,11 +19,8 @@ def pick_folder(title: str, initialdir: str | None = None) -> str:
     path = filedialog.askdirectory(title=title, initialdir=initialdir)
     root.destroy()
     return path
-
-
 def pick_file(title: str, filetypes: list[tuple[str, str]],
               initialdir: str | None = None) -> str:
-    """Open a file picker dialog. Returns the selected path or '' if cancelled."""
     if not HAS_TK:
         return input(f"{title} (paste path): ").strip().strip('"')
     root = tk.Tk()
@@ -62,10 +30,7 @@ def pick_file(title: str, filetypes: list[tuple[str, str]],
                                       initialdir=initialdir)
     root.destroy()
     return path
-
-
 def confirm(title: str, msg: str) -> bool:
-    """Yes/No dialog. Returns True/False."""
     if not HAS_TK:
         return input(f"{msg} [y/N]: ").strip().lower().startswith("y")
     root = tk.Tk()
@@ -74,22 +39,11 @@ def confirm(title: str, msg: str) -> bool:
     ans = messagebox.askyesno(title, msg)
     root.destroy()
     return ans
-
-
-# ----------------------------------------------------------------------
-# Config defaults (used as initialdir / fallback for the dialogs)
-# ----------------------------------------------------------------------
 DEFAULT_SRC_RASTERS = r"G:\Deep learning for wildfire susceptibility mapping\BC Rasampled 1500m Rasters"
 DEFAULT_PROJ_ROOT   = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso"
 DEFAULT_NFDB        = r"G:\Deep learning for wildfire susceptibility mapping"
-
 CATEGORICAL_KEYWORDS = ("lulc", "aspect")
 THRESHOLDS_HA = (50, 70, 100)
-
-
-# ----------------------------------------------------------------------
-# Step 0 - Interactive path collection
-# ----------------------------------------------------------------------
 print("=" * 70)
 print("DAY 2 AUTOMATION - Wildfire BC BiLSTM-PSO revision (ECOINF-D-26-01275 R1)")
 print("=" * 70)
@@ -101,7 +55,6 @@ print("  3. The CWFIS NFDB perimeter shapefile (.shp)")
 print()
 print("If a dialog appears behind ArcGIS Pro, click the tkinter icon in the taskbar.")
 print()
-
 SRC_RASTERS = pick_folder(
     "Step 1 of 3: Select the folder with your 1500 m source rasters",
     initialdir=DEFAULT_SRC_RASTERS if os.path.isdir(DEFAULT_SRC_RASTERS) else None,
@@ -110,7 +63,6 @@ if not SRC_RASTERS:
     print("CANCELLED at Step 1. Re-run when ready.")
     sys.exit(1)
 print(f"  Source rasters folder: {SRC_RASTERS}")
-
 PROJ_ROOT = pick_folder(
     "Step 2 of 3: Select your project root (wildfire-bc-bilstm-pso)",
     initialdir=DEFAULT_PROJ_ROOT if os.path.isdir(DEFAULT_PROJ_ROOT) else None,
@@ -119,7 +71,6 @@ if not PROJ_ROOT:
     print("CANCELLED at Step 2. Re-run when ready.")
     sys.exit(1)
 print(f"  Project root:          {PROJ_ROOT}")
-
 NFDB_SHP = pick_file(
     "Step 3 of 3: Select the CWFIS NFDB perimeter shapefile (.shp)",
     filetypes=[("Shapefile", "*.shp"), ("GeoPackage", "*.gpkg"), ("All files", "*.*")],
@@ -129,7 +80,6 @@ if not NFDB_SHP:
     print("CANCELLED at Step 3. Re-run when ready.")
     sys.exit(1)
 print(f"  NFDB perimeters:       {NFDB_SHP}")
-
 if not confirm("Confirm settings",
                f"Source rasters:\n  {SRC_RASTERS}\n\n"
                f"Project root:\n  {PROJ_ROOT}\n\n"
@@ -137,66 +87,43 @@ if not confirm("Confirm settings",
                f"Proceed with reprojection + threshold sensitivity + autocorrelation?"):
     print("CANCELLED by user.")
     sys.exit(1)
-
-# ----------------------------------------------------------------------
-# Derived paths
-# ----------------------------------------------------------------------
 RASTERS_BC = os.path.join(PROJ_ROOT, "data", "rasters_bcalbers")
 VECTORS_BC = os.path.join(PROJ_ROOT, "data", "vectors_bcalbers")
 PROCESSED  = os.path.join(PROJ_ROOT, "data", "processed")
 TABLES     = os.path.join(PROJ_ROOT, "tables")
 FIGS       = os.path.join(PROJ_ROOT, "figs")
 LOG_PATH   = os.path.join(TABLES, "T_day2_automation_log.txt")
-
 for d in (RASTERS_BC, VECTORS_BC, PROCESSED, TABLES, FIGS):
     os.makedirs(d, exist_ok=True)
 open(LOG_PATH, "w", encoding="utf-8").close()
-
-
 def log(msg: str) -> None:
     line = f"[{time.strftime('%H:%M:%S')}] {msg}"
     print(line)
     with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(line + "\n")
-
-
 def clean_name(name: str) -> str:
-    """Strip resamp suffixes from input filenames and lowercase."""
     out = name
     for suf in ("_resamp_1000.0_resamp_1500.0", "_BC_500m", "_BC", "_500m"):
         out = out.replace(suf, "")
     out = out.replace(".tif", "").lower()
     return out + ".tif"
-
-
-# ----------------------------------------------------------------------
-# ArcPy setup
-# ----------------------------------------------------------------------
 try:
     import arcpy
 except ImportError:
     log("ERROR: arcpy is not available. Run this script from ArcGIS Pro's Python window.")
     sys.exit(2)
-
 arcpy.env.overwriteOutput = True
 arcpy.CheckOutExtension("Spatial")
-TARGET_CRS = arcpy.SpatialReference(3005)  # NAD 1983 BC Environment Albers
-
+TARGET_CRS = arcpy.SpatialReference(3005)
 log(f"Started at {time.strftime('%Y-%m-%d %H:%M:%S')}")
 log(f"Source rasters: {SRC_RASTERS}")
 log(f"Project root:   {PROJ_ROOT}")
 log(f"NFDB shapefile: {NFDB_SHP}")
 log("")
-
-
-# ----------------------------------------------------------------------
-# PHASE C - Reproject rasters
-# ----------------------------------------------------------------------
 def phase_c_rasters() -> int:
     log("=" * 70)
     log("PHASE C - Reproject rasters to EPSG:3005 BC Albers (Comment 9)")
     log("=" * 70)
-
     tifs = sorted(
         f for f in os.listdir(SRC_RASTERS)
         if f.lower().endswith(".tif")
@@ -204,7 +131,6 @@ def phase_c_rasters() -> int:
            and not any(s in f.lower() for s in (".aux", ".ovr", ".vat"))
     )
     log(f"  Found {len(tifs)} 1500 m raster(s) matching '*resamp_1500*.tif'")
-
     rows = []
     for i, tif in enumerate(tifs, 1):
         src = os.path.join(SRC_RASTERS, tif)
@@ -227,7 +153,6 @@ def phase_c_rasters() -> int:
         except Exception as e:
             log(f"  FAILED: {tif}: {e}")
             rows.append((tif, out_name, resamp, "FAILED", str(e)[:80]))
-
     csv_path = os.path.join(TABLES, "T_reprojection_log.csv")
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -235,11 +160,6 @@ def phase_c_rasters() -> int:
         w.writerows(rows)
     log(f"  Wrote: {csv_path}")
     return len(rows)
-
-
-# ----------------------------------------------------------------------
-# PHASE C.1 - Reproject NFDB perimeters
-# ----------------------------------------------------------------------
 def phase_c1_nfdb() -> str | None:
     log("")
     log("=" * 70)
@@ -258,18 +178,12 @@ def phase_c1_nfdb() -> str | None:
     except Exception as e:
         log(f"  FAILED: {e}")
         return None
-
-
-# ----------------------------------------------------------------------
-# PHASE D - Threshold sensitivity (Comment 11)
-# ----------------------------------------------------------------------
 def phase_d_threshold(nfdb_bc: str) -> dict:
     log("")
     log("=" * 70)
     log("PHASE D - 70 ha threshold sensitivity (Comment 11)")
     log("=" * 70)
     fields = [f.name for f in arcpy.ListFields(nfdb_bc)]
-
     if "AREA_HA" not in fields:
         arcpy.management.AddField(nfdb_bc, "AREA_HA", "DOUBLE")
         arcpy.management.CalculateGeometryAttributes(
@@ -279,13 +193,10 @@ def phase_d_threshold(nfdb_bc: str) -> dict:
         )
         log("  Added and calculated AREA_HA")
         fields.append("AREA_HA")
-
     year_col = next((c for c in ("YEAR", "YEAR_", "FIRE_YEAR", "YEAR_FIRE") if c in fields), None)
     parts = []
-    # Year filter
     if year_col:
         parts.append(f"\"{year_col}\" >= 2000 AND \"{year_col}\" <= 2024")
-    # BC geographic bounding box (catches BC + Parks Canada fires inside BC)
     if "LATITUDE" in fields and "LONGITUDE" in fields:
         parts.append("\"LATITUDE\" >= 48.30 AND \"LATITUDE\" <= 60.00")
         parts.append("\"LONGITUDE\" >= -139.06 AND \"LONGITUDE\" <= -114.03")
@@ -295,7 +206,6 @@ def phase_d_threshold(nfdb_bc: str) -> dict:
         log("  BC filter: SRC_AGENCY IN ('BC','PC') -- no LAT/LON fields available")
     base = " AND ".join(parts)
     log(f"  Base filter: {base if base else '(none)'}")
-
     counts = {}
     for thr in THRESHOLDS_HA:
         where = f"({base}) AND \"AREA_HA\" >= {thr}" if base else f"\"AREA_HA\" >= {thr}"
@@ -308,7 +218,6 @@ def phase_d_threshold(nfdb_bc: str) -> dict:
         except Exception as e:
             log(f"  FAILED at {thr} ha: {e}")
             counts[thr] = 0
-
     csv_path = os.path.join(TABLES, "T_sensitivity_threshold.csv")
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -317,11 +226,6 @@ def phase_d_threshold(nfdb_bc: str) -> dict:
             w.writerow([thr, counts.get(thr, 0), "TRUE" if thr == 70 else "FALSE"])
     log(f"  Wrote: {csv_path}")
     return counts
-
-
-# ----------------------------------------------------------------------
-# PHASE E - Spatial autocorrelation (Comment 10)
-# ----------------------------------------------------------------------
 def _parse_moran_messages(msgs: str) -> tuple[float | None, float | None, float | None]:
     I = z = p = None
     for line in msgs.splitlines():
@@ -336,26 +240,19 @@ def _parse_moran_messages(msgs: str) -> tuple[float | None, float | None, float 
             try: p = float(s.split(":")[-1].strip())
             except: pass
     return I, z, p
-
-
 def phase_e_autocorr() -> list:
     log("")
     log("=" * 70)
     log("PHASE E - Spatial autocorrelation: Moran's I + LISA (Comment 10)")
     log("=" * 70)
-
     fires_70 = os.path.join(PROCESSED, "fires_geq_70ha.shp")
     if not os.path.exists(fires_70):
         log(f"  ABORT: {fires_70} not found. Run Phase D first.")
         return []
-
-    # E.1 - Fire centroids
     centroids = os.path.join(PROCESSED, "fire_centroids_70ha.shp")
     arcpy.management.FeatureToPoint(fires_70, centroids, "INSIDE")
     n = int(arcpy.management.GetCount(centroids)[0])
     log(f"  Fire centroids: {n:,} points")
-
-    # E.2 - Extract multi-values to points
     rasters = sorted(
         os.path.join(RASTERS_BC, f) for f in os.listdir(RASTERS_BC)
         if f.lower().endswith(".tif") and "mask" not in f.lower()
@@ -363,8 +260,6 @@ def phase_e_autocorr() -> list:
     extract_list = [[r, os.path.splitext(os.path.basename(r))[0]] for r in rasters]
     log(f"  Sampling {len(extract_list)} predictor rasters at centroids ...")
     arcpy.sa.ExtractMultiValuesToPoints(centroids, extract_list, "NONE")
-
-    # E.3 - Global Moran's I per numeric field
     skip = {"FID", "Shape", "ORIG_FID", "Id", "AREA_HA", "SIZE_HA", "POLY_HA", "OBJECTID"}
     sampled = [
         f.name for f in arcpy.ListFields(centroids)
@@ -373,7 +268,6 @@ def phase_e_autocorr() -> list:
     ]
     csv_path = os.path.join(TABLES, "T_autocorrelation_global.csv")
     log(f"  Computing Moran's I for {len(sampled)} predictor field(s) ...")
-
     moran_rows = []
     for fld in sampled:
         try:
@@ -401,19 +295,15 @@ def phase_e_autocorr() -> list:
             log(f"    {fld:30s}  FAILED: {str(e)[:80]}")
             moran_rows.append({"variable": fld, "moran_I": None, "moran_z": None,
                                "moran_p": None, "interpretation": f"ERROR: {e}"})
-
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["variable", "moran_I", "moran_z", "moran_p", "interpretation"])
         w.writeheader()
         w.writerows(moran_rows)
     log(f"  Wrote: {csv_path}")
-
-    # E.4 - LISA on top 4 by |Moran I|
     valid = [r for r in moran_rows if isinstance(r["moran_I"], (int, float))]
     valid.sort(key=lambda r: abs(r["moran_I"]), reverse=True)
     top4 = [r["variable"] for r in valid[:4]]
     log(f"  Top 4 predictors by |Moran's I|: {top4}")
-
     for fld in top4:
         out_lisa = os.path.join(PROCESSED, f"lisa_{fld}.shp")
         try:
@@ -430,13 +320,7 @@ def phase_e_autocorr() -> list:
             log(f"    LISA {fld:30s} -> {out_lisa}")
         except Exception as e:
             log(f"    LISA {fld:30s} FAILED: {str(e)[:80]}")
-
     return top4
-
-
-# ----------------------------------------------------------------------
-# MAIN
-# ----------------------------------------------------------------------
 def main():
     try:
         n_rasters = phase_c_rasters()
@@ -444,7 +328,6 @@ def main():
         if nfdb_bc:
             counts = phase_d_threshold(nfdb_bc)
         top4 = phase_e_autocorr()
-
         log("")
         log("=" * 70)
         log("DAY 2 ARCPY AUTOMATION COMPLETE")
@@ -474,7 +357,6 @@ def main():
         log("  git add tables\\T_*.csv")
         log('  git commit -m "Day 2 ArcPy automation: reprojection + threshold sensitivity + spatial autocorrelation (Comments 7, 9, 10, 11)"')
         log("  git push")
-
         if HAS_TK:
             messagebox.showinfo(
                 "Day 2 Automation Complete",
@@ -490,7 +372,4 @@ def main():
         if HAS_TK:
             messagebox.showerror("Day 2 Automation - Error",
                                  f"An error occurred:\n\n{e}\n\nSee log:\n{LOG_PATH}")
-
-
 main()
-

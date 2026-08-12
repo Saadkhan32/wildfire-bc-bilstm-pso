@@ -1,27 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-revision_step3_run_all_models.py
-================================
-STEP 3 of 5 -- Production run.  All 4 models x 12 (thr, seed) combos = 48 runs.
-
-Same models, same CLI args, same output schema as before -- now with:
-  - VS Code / Visual Studio friendly unbuffered output
-  - Live tqdm progress bar (overall + per-combo ETA)
-  - Live streaming of each model's stdout into the terminal
-  - Cached paths (.revision_step3_paths.json) so re-runs do not re-ask
-  - Resumable: skips combos where metrics_summary.json already exists
-
-VS Code usage:
-  - Select interpreter: wildfire conda env
-  - Press F5 (Run with debugger) or Ctrl+F5 (Run without debugger)
-
-CLI usage:
-    conda activate wildfire
-    python src\revision_step3_run_all_models.py
-"""
 import os
 import sys
-
 os.environ["PYTHONUNBUFFERED"] = "1"
 os.environ["PYTHONIOENCODING"] = "utf-8"
 try:
@@ -29,13 +7,11 @@ try:
     sys.stderr.reconfigure(line_buffering=True)
 except Exception:
     pass
-
 import json
 import time
 import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
-
 try:
     from tqdm import tqdm
 except ImportError:
@@ -43,14 +19,10 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "tqdm",
                             "--quiet", "--disable-pip-version-check"])
     from tqdm import tqdm
-
-# ---- Design ----
 SEEDS_AT_THR70    = [42, 101, 202, 303, 404, 505, 606, 707, 808, 909]
 THRESHOLDS_AT_S42 = [100, 200]
 THR_MAIN          = 70
 SEED_MAIN         = 42
-
-# ---- PSO budget (production) ----
 OBJECTIVE      = "roc"
 GRID_KM        = 50
 PROGRESS       = "none"
@@ -61,16 +33,10 @@ SEARCH_EPOCHS  = 30
 RETRAIN_EPOCHS = 30
 NONPSO_EPOCHS  = 30
 FORCE_RERUN    = False
-
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             ".revision_step3_paths.json")
-
-# ============================================================
-# Tkinter helpers + cached paths
-# ============================================================
 def _root():
     r = tk.Tk(); r.withdraw(); r.attributes("-topmost", True); return r
-
 def pick_file(t, ft, default=None):
     r = _root()
     initdir = os.path.dirname(default) if default and os.path.exists(default) else None
@@ -78,16 +44,13 @@ def pick_file(t, ft, default=None):
     p = filedialog.askopenfilename(title=t, filetypes=ft,
                                     initialdir=initdir, initialfile=initfile)
     r.destroy(); return p
-
 def pick_folder(t, default=None):
     r = _root()
     initdir = default if default and os.path.exists(default) else None
     p = filedialog.askdirectory(title=t, initialdir=initdir)
     r.destroy(); return p
-
 def confirm(t, m):
     r = _root(); a = messagebox.askyesno(t, m); r.destroy(); return a
-
 def load_cache():
     if os.path.exists(CONFIG_PATH):
         try:
@@ -95,16 +58,11 @@ def load_cache():
                 return json.load(f)
         except Exception: pass
     return {}
-
 def save_cache(c):
     try:
         with open(CONFIG_PATH, "w", encoding="utf-8") as f:
             json.dump(c, f, indent=2)
     except Exception: pass
-
-# ============================================================
-# Streaming subprocess runner
-# ============================================================
 def run_streaming(cmd, log_path, pbar=None, label=""):
     t0 = time.time()
     with open(log_path, "w", encoding="utf-8") as logf:
@@ -122,73 +80,55 @@ def run_streaming(cmd, log_path, pbar=None, label=""):
                     pbar.set_postfix_str(f"{label}: {stripped[:60]}")
         proc.wait()
     return proc.returncode, time.time() - t0
-
-# ============================================================
-# Banner
-# ============================================================
 print("=" * 70, flush=True)
 print("STEP 3 / 5: Run ALL 4 models on 12 datasets (Option C lean)", flush=True)
 print("  - 48 runs total, resumable", flush=True)
 print("  - Live progress bar + streaming model output", flush=True)
 print("=" * 70, flush=True)
-
 cache = load_cache()
-
 print("\nDialog 1/6: pick 03_Training_Tables folder", flush=True)
 tables = pick_folder("STEP 3 1/6: 03_Training_Tables", cache.get("tables"))
 if not tables: sys.exit(1)
 cache["tables"] = tables
-
 print("Dialog 2/6: pick BiLSTM PSO FE.py", flush=True)
 bilstm_pso = pick_file("STEP 3 2/6: BiLSTM PSO FE.py",
                        [("Python", "*.py")], cache.get("bilstm_pso"))
 if not bilstm_pso: sys.exit(1)
 cache["bilstm_pso"] = bilstm_pso
-
 print("Dialog 3/6: pick LSTM PSO FE.py", flush=True)
 lstm_pso = pick_file("STEP 3 3/6: LSTM PSO FE.py",
                      [("Python", "*.py")], cache.get("lstm_pso"))
 if not lstm_pso: sys.exit(1)
 cache["lstm_pso"] = lstm_pso
-
 print("Dialog 4/6: pick c8c11_non_pso_cli.py", flush=True)
 nonpso_cli = pick_file("STEP 3 4/6: c8c11_non_pso_cli.py",
                        [("Python", "*.py")], cache.get("nonpso_cli"))
 if not nonpso_cli: sys.exit(1)
 cache["nonpso_cli"] = nonpso_cli
-
 print("Dialog 5/6: pick 05_Model_Results folder", flush=True)
 out_root = pick_folder("STEP 3 5/6: 05_Model_Results", cache.get("out_root"))
 if not out_root: sys.exit(1)
 cache["out_root"] = out_root
-
 print("Dialog 6/6: pick wildfire env python.exe", flush=True)
 python_exe = pick_file("STEP 3 6/6: python.exe",
     [("Executable", "python.exe"), ("All", "*.*")], cache.get("python_exe"))
 if not python_exe: python_exe = sys.executable
 cache["python_exe"] = python_exe
-
 save_cache(cache)
 print(f"\n[paths cached to {CONFIG_PATH}]", flush=True)
-
-# ---- Plan ----
 combos = [(THR_MAIN, s) for s in SEEDS_AT_THR70]
 for thr in THRESHOLDS_AT_S42:
     combos.append((thr, SEED_MAIN))
-
 plan = []
 for thr, s in combos:
     csv = os.path.join(tables, f"training_thr{thr}_seed{s}.csv")
     if not os.path.exists(csv):
         print(f"MISSING CSV: {csv}", flush=True); sys.exit(2)
     plan.append((thr, s, csv))
-
 def needs(name, thr, s):
     d = os.path.join(out_root, name, f"thr{thr}", f"seed{s}")
     return FORCE_RERUN or not os.path.exists(os.path.join(d, "metrics_summary.json"))
-
-# Count work
-task_list = []  # (combo_idx, thr, s, csv, name, kind, script)
+task_list = []
 for ci, (thr, s, csv) in enumerate(plan):
     if needs("BiLSTM_PSO", thr, s):
         task_list.append((ci, thr, s, csv, "BiLSTM_PSO", "pso", bilstm_pso))
@@ -200,11 +140,9 @@ for ci, (thr, s, csv) in enumerate(plan):
         if needs("BiLSTM", thr, s): which.append("bilstm")
         task_list.append((ci, thr, s, csv, "+".join(w.upper() for w in which),
                           "nonpso", nonpso_cli, which))
-
 n_pso    = sum(1 for t in task_list if t[5] == "pso")
 n_nonpso = sum(1 for t in task_list if t[5] == "nonpso")
 est_h = (n_pso * 45 + n_nonpso * 25) / 60
-
 print(f"\nPlan: 4 models x {len(plan)} combos = {4*len(plan)} runs.", flush=True)
 print(f"  PSO subprocess runs remaining:      {n_pso}", flush=True)
 print(f"  non-PSO subprocess runs remaining:  {n_nonpso}", flush=True)
@@ -213,17 +151,11 @@ if not confirm("Ready?",
     f"4 models x {len(plan)} combos.\nPSO remaining: {n_pso}\n"
     f"non-PSO remaining: {n_nonpso}\nEstimate: ~{est_h:.0f} hours.\n\nProceed?"):
     sys.exit(0)
-
-# ============================================================
-# Execute with overall progress bar
-# ============================================================
 t_total = time.time()
 ok = 0; fail = 0
 fail_logs = []
-
 pbar = tqdm(total=len(task_list), desc="STEP 3", unit="run",
             bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]")
-
 for entry in task_list:
     if entry[5] == "pso":
         ci, thr, s, csv, name, kind, script = entry
@@ -275,12 +207,7 @@ for entry in task_list:
             fail += len(which); fail_logs.append(log)
             tqdm.write(f"  >>> {label}: FAIL ({dt/60:.1f} min)  log: {log}")
     pbar.update(1)
-
 pbar.close()
-
-# ============================================================
-# Summary
-# ============================================================
 print("\n" + "=" * 70, flush=True)
 print(f"STEP 3 finished in {(time.time()-t_total)/3600:.2f} hours", flush=True)
 print(f"  OK:   {ok}", flush=True)
@@ -292,7 +219,6 @@ if fail_logs:
         print(f"  {lg}", flush=True)
 print("\nNext: STEP 4", flush=True)
 print("  python src\\revision_step4_summarize_all_models.py", flush=True)
-
 try:
     a = _root()
     if fail == 0:
