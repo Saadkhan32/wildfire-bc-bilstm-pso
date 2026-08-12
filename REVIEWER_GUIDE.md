@@ -41,24 +41,43 @@ environment + headline-metric smoke test.
 
 Random seeds are fixed (42); deterministic steps reproduce exactly.
 
-## 3. Map manuscript results to scripts
+## 3. One-command reproduction
 
-Scripts live in `src/` (stage-by-stage index: `src/README.md`). Each script
-documents its inputs and arguments in its header.
+With the archives unpacked, `python reproduce.py` runs the environment
+checks and rebuilds everything derivable from the shipped data and trained
+models — the four-model ROC figure, the annual trend figure, the Fig. 12
+climate composites, the Fig. 17 SHAP beeswarm and the Fig. 18
+teleconnection figure — and prints a PASS/FAIL summary. The table below
+covers every quantitative manuscript result.
 
-| Manuscript result | Script |
+## 4. Map manuscript results to scripts
+
+Every quantitative result in the manuscript is covered by one of two tiers.
+Tier 1 — rebuilt on your machine by `python reproduce.py` from the shipped
+data and trained models. Tier 2 — the computed result itself is shipped in
+the package (tables/, data/susceptibility/, models/) together with the
+script that produced it; these scripts document the full procedure and
+expect the staged training workspace (`revision_c8c11/`) that
+`src/*_setup_folders.py` creates, so rerunning them is optional, not
+required, for verification. Scripts live in `src/` (index: `src/README.md`).
+
+| Manuscript result | How to verify / reproduce |
 |---|---|
-| Climate statistics (Table 5, Fig. 12) | `src/run_climate_full_stats.py` |
-| Annual trend analysis (Fig. 5a) | `src/fig_wildfire_trend.py` |
-| Spatial autocorrelation checks | `src/c8_assumption_checks.py` |
-| Susceptibility prediction (four models) | `src/predict_bc_4models.py` |
-| Class-area summary | `src/predict_bc_susceptibility.py` |
-| ROC curves (train/test) | `make_roc_figure.py` (package root) |
-| SHAP explanation (Fig. 17) | `src/build_shap_beeswarm.py`; `src/specific_humidity_update/Figure17_SHAP_beeswarm_specific_humidity.py` |
-| ENSO/PDO teleconnections (Fig. 18) | `src/phase_f_enso_pdo.py`; `src/specific_humidity_update/Figure18_ENSO_PDO_teleconnection_specific_humidity.py` |
-| Cross-border comparison (Fig. S6b) | `src/cross_border_c4.py` |
+| Climate statistics (Table 5) | shipped `tables/T_climate_stats_publication.csv`; the headline Theil–Sen slopes are re-derived deterministically by the smoke test (`test_reproducibility.py`) |
+| Seasonal climate composites (Fig. 12) | `reproduce.py` step 4 — rebuilt from the five monthly CSVs in `data/` into `figs/climate_v2/` |
+| Annual trend analysis (Fig. 5a) | `reproduce.py` step 3 (`src/fig_wildfire_trend.py` + `figure_style.py`); CI register shipped: `tables/TrendRegister_TheilSen_CI.csv` |
+| ROC curves, train/test (model performance) | `reproduce.py` step 2 or `python make_roc_figure.py` — recomputed from the trained weights; AUCs cross-checked against `models/*/thr70/seed42/metrics_summary.json` |
+| Cross-validation metrics and bootstrap CIs | shipped `models/*/cv_metrics_10fold.csv`, `models/*/cv_oof_predictions.csv`, `tables/T_metrics_bootstrap.csv`; recompute: `src/phase_b_bootstrap_ci.py` |
+| Spatial autocorrelation (Moran's I, Geary's C) | shipped `tables/T_autocorrelation_global.csv`, `tables/T_gearys_c.csv`, `tables/T_morans_per_threshold.csv`; recompute: `src/c8_assumption_checks.py` |
+| Susceptibility maps, four models | per-model grids shipped in `data/susceptibility/`; recompute: `src/predict_bc_4models.py` from `models/` + `data/rasters/` (staged workspace, long runtime); the manuscript map figures are GIS renderings of these grids (EPSG:3005) |
+| Class-area summary | `src/predict_bc_susceptibility.py` over the shipped susceptibility grids |
+| SHAP explanation (Fig. 17) | `reproduce.py` step 5 from shipped `data/shap/SHAP_BiLSTM_PSO_values.pkl`; from scratch: `src/build_shap_beeswarm.py` (loads the trained models) |
+| ENSO/PDO teleconnections (Fig. 18, Section 3.9) | `reproduce.py` step 6; correlation table shipped: `tables/T_teleconnection_burnedarea_corr.csv`; stats script: `src/specific_humidity_update/Section3-9_teleconnection_stats_specific_humidity.py` |
+| Cross-border comparison (Fig. S6b) | inputs shipped (`data/cross_border_US/`, `data/susceptibility/`); script: `src/cross_border_c4.py` (staged workspace) |
+| Model training from scratch | staged workflow `src/revision_step*.py` / `src/c8c11_step*.py`; optional — the trained models are shipped |
+| Study-area and data-preparation maps | GIS cartography (ArcGIS Pro, EPSG:3005) from the shipped and source layers listed in `DATA_SOURCES.md` |
 
-## 4. Data documentation
+## 5. Data documentation
 
 - `data/README.md` (shipped inside data.zip) — dataset index with ISO 19115-2 record,
   provider and licence per dataset group

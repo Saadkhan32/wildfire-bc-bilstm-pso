@@ -16,6 +16,16 @@
   ROC figure from the archived training table and trained weights using
   package paths; --check mode verifies inputs. Replaces the working-copy-only
   src/build_roc_train_test.py in the reviewer guide.
+- New reproduce.py (package root): one command that runs the smoke test and
+  rebuilds every result derivable from the shipped data and trained models -
+  ROC curves, annual trend figure, Fig. 12 climate composites, Fig. 17 SHAP
+  beeswarm and Fig. 18 teleconnections - with a PASS/FAIL summary.
+- REVIEWER_GUIDE: complete result-by-result reproducibility matrix covering
+  every quantitative manuscript result (rebuilt by reproduce.py, or shipped
+  in tables/, data/susceptibility/ and models/ with its producing script).
+- figure_style.py added at the package root: shared Matplotlib style helper
+  required by src/fig_wildfire_trend.py that was previously missing from the
+  distribution.
 
 ## v1.1.4 - 2026-08-12
 - No-overlap packaging: the six files that existed both in git and in the

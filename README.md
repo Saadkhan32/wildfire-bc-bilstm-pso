@@ -184,12 +184,32 @@ SUMMARY:  <n> pass | <n> warn | 0 fail
   climate trend values deterministically (seeds fixed at 42) and must end with
   `0 fail`.
 
-To run the full pipeline afterwards, follow the stage-by-stage index in
+### One-command reproduction from the trained models
+
+Once `data.zip` and `models.zip` are unpacked, a single command runs the
+checks and rebuilds every result derivable from the shipped data and
+already-trained models (no retraining):
+
+```
+python reproduce.py
+```
+
+It runs the smoke test, the four-model train/test ROC figure (from the
+trained weights), the annual wildfire trend figure, the seasonal climate
+composites (Fig. 12), the SHAP beeswarm (Fig. 17) and the ENSO/PDO
+teleconnection figure (Fig. 18), then prints a PASS/FAIL summary; outputs
+land in `figs/`. The complete result-by-result reproducibility map is in
+`REVIEWER_GUIDE.md`.
+
+Each step is also available on its own — for only the ROC curves from the
+trained models:
+
+```
+python make_roc_figure.py
+```
+
+To run the full pipeline beyond that, follow the stage-by-stage index in
 `src/README.md`; the reviewer-oriented walkthrough is `REVIEWER_GUIDE.md`.
-Quick visual checks once the archives are unpacked: `python make_roc_figure.py`
-rebuilds the four-model ROC figure from the trained weights, and
-`python src/fig_wildfire_trend.py` rebuilds the annual trend figure (both
-write into `figs/`).
 
 ### Verify file integrity
 
