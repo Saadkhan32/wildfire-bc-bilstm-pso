@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.3 - 2026-08-12
+- Figures: replaced the reconstructed Figure 2 and Figure 4 sources with the
+  authors' final versions (Fig2_in_manuscript; LSTM_Final, BiLSTM_Final and
+  PSO_LightPalette_with_Legend panels), each as editable PPTX with vector PDF
+  and 400 dpi PNG exports (`figs/manuscript_R2/`).
+- README: prerequisites and PowerShell-safe reproduction commands.
+
 ## v1.1.2 - 2026-08-12
 - Smoke test (test_reproducibility.py) rewritten for the actual package layout
   and given a deterministic numeric check (May-August Theil-Sen climate trends
