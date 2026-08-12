@@ -57,7 +57,7 @@ DataCite via Zenodo; SHA-256 checksums. These records follow the ISO 19115-2 sch
 
 Verify integrity:
 ```bash
-cd metadata && sha256sum -c checksums_sha256.txt
+sha256sum -c metadata/checksums_sha256.txt   # run from the package root
 ```
 
 ## Reproducing the analysis

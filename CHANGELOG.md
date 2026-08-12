@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.1 - 2026-08-12
+- Replication-drill fixes: content checksums regenerated for the actual package
+  tree (root-relative paths, scoped to data/models/src/R/notebooks); verification
+  commands corrected to run from the package root; HOW_TO_ASSEMBLE and the
+  reviewer guide updated to the real code layout (src/, R/, notebooks/) with a
+  result-to-script mapping table.
+
 ## v1.1-revision2 — 2026-08-11
 - Metadata: replaced placeholder templates with populated records — 10 ISO 19115-2 XML
   (one per dataset group), 11 CSVW JSON-LD dictionaries, SHA-256 checksums, dataset

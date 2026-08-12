@@ -30,7 +30,7 @@ conditioning factors (data/rasters)            wildfire records (data/processed)
 
 ## Step-by-step crosswalk
 
-| # | Method step (manuscript) | Script (`code/`) | Input data | Output |
+| # | Method step (manuscript) | Script (`src/`) | Input data | Output |
 |---|---|---|---|---|
 | 1 | Assemble conditioning factors on the 1.5 km BC Albers grid | (GIS pre-processing; layers provided) | `data/rasters/*.tif` | 18 predictor rasters |
 | 2 | Sample fire / non-fire points; generate spatially independent pseudo-absences | `generate_pseudo_absence.py` | `data/processed/fires_geq_70ha.*`, `data/rasters/` | `data/training_points_*.csv` |
@@ -50,6 +50,6 @@ Helpers: `seeds.py` (fixed random seeds for reproducibility) and `figure_style.p
 
 ## Reproducibility controls
 - **Environment:** `environment.yml` pins Python 3.10 and all geospatial / ML dependencies.
-- **Determinism:** random seeds are fixed in `code/seeds.py`; deterministic steps reproduce exactly,
+- **Determinism:** random seeds are fixed in `src/seeds.py`; deterministic steps reproduce exactly,
   and deep-learning steps reproduce within small run-to-run variation across hardware.
 - **Provenance:** `metadata/checksums_sha256.txt` lists a SHA-256 hash for every file.
