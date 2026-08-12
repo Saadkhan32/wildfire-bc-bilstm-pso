@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.2 - 2026-08-12
+- Smoke test (test_reproducibility.py) rewritten for the actual package layout
+  and given a deterministic numeric check (May-August Theil-Sen climate trends
+  reproduce the manuscript values from the shipped data). Verified: exit 0 on
+  the assembled package and on a code-only clone.
+- fig_wildfire_trend.py restored to src/ (referenced by the reviewer guide).
+
 ## v1.1.1 - 2026-08-12
 - Replication-drill fixes: content checksums regenerated for the actual package
   tree (root-relative paths, scoped to data/models/src/R/notebooks); verification
