@@ -1,22 +1,43 @@
 # wildfire-bc-bilstm-pso
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20389083.svg)](https://doi.org/10.5281/zenodo.20389083)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Code, data, and metadata supporting **Khan et al. (2026)**, *Ecological Informatics*
 (manuscript **ECOINF-D-26-01275**):
 
 > **Geospatial Deep Learning and SHAP-Based Explainable AI for Wildfire Susceptibility and Exposure Mapping in Western Canada**
 
+## What this study does
+
+Wildfire susceptibility and exposure are mapped for British Columbia, Canada
+(2000–2024) on a 1.5 km analysis grid (BC Albers, EPSG:3005). LSTM and BiLSTM
+deep-learning models are trained on topographic, environmental, vegetation and
+climate predictors, with hyperparameters tuned by particle swarm optimization
+(PSO); the PSO-optimized BiLSTM performed best (ROC-AUC = 0.92). SHAP is used
+as post-hoc explainable AI to attribute predictions to individual variables,
+and the susceptibility maps are combined with road and household data for an
+exposure assessment, including a cross-border consistency check against US
+estimates. This repository contains the complete pipeline: data preparation,
+model training, evaluation, SHAP analysis, trend statistics and every
+manuscript figure.
+
 ## Where to find what
 
 | You want… | Go to |
 |---|---|
-| Source code (version-controlled) | this GitHub repository |
+| Source code (version-controlled, latest) | this GitHub repository |
 | The exact frozen version behind the paper, incl. **data + trained models** | Zenodo: **https://doi.org/10.5281/zenodo.20389083** |
 | Metadata (ISO 19115-2, CSVW, checksums) | `metadata/` — here and on Zenodo |
 | Third-party input data | not redistributed — `DATA_SOURCES.md` lists provider, link, and licence for each |
 
-**GitHub hosts the code; Zenodo is the permanent citable archive of code + data + metadata.**
-The DOI above is the *concept DOI* and always resolves to the newest archived version;
-each version also has its own DOI, shown on the Zenodo page.
+**How GitHub and Zenodo relate.** GitHub hosts the living code; Zenodo is the
+permanent, citable archive of code + data + metadata. The DOI above is the
+*concept DOI*: it always resolves to the newest archived version. Each archived
+version additionally has its own immutable DOI — the version used in this study
+is **https://doi.org/10.5281/zenodo.21899021**, which matches git tag
+`v1.1-revision2` in this repository (the archived `code.zip` is byte-identical
+to that tag).
 
 ## Repository layout
 
@@ -30,7 +51,8 @@ data/
                 large files -- download data.zip from Zenodo (unpacks here);
                 full dataset index: data/README.md
 models/         trained Keras weights -- models.zip on Zenodo
-figs/           manuscript figures (figs/manuscript_R2/ = revision-2 finals)
+figs/           manuscript figures (figs/manuscript_R2/ = revision-2 finals,
+                each as editable PPTX + vector PDF + 400 dpi PNG)
 tables/         exported result tables incl. the Theil-Sen CI trend register
 metadata/
   iso19115/     ISO 19115-2 XML -- one record per dataset group
@@ -40,6 +62,79 @@ docs/           see docs/README.md (drafts are not distributed here)
 CHANGELOG.md  CITATION.cff  DATA_SOURCES.md  METHODS.md  REVIEWER_GUIDE.md
 environment.yml / environment.lock.yml / renv.lock   (pinned environments)
 ```
+
+## Reproducing the analysis
+
+### Prerequisites
+
+| Tool | Version | Notes |
+|---|---|---|
+| Git | any recent | https://git-scm.com |
+| Miniconda (or Anaconda) | any recent | https://docs.conda.io — provides Python 3.10 via `environment.yml` |
+| R | ≥ 4.2 | **optional** — only for the R-based figures |
+
+On Windows, run every command below in the **Anaconda PowerShell Prompt**
+(Start menu → Anaconda). Plain PowerShell and CMD do not know `conda`.
+
+### Step by step
+
+```bash
+# 1. Get the code and switch to the archived version
+git clone https://github.com/Saadkhan32/wildfire-bc-bilstm-pso.git
+cd wildfire-bc-bilstm-pso
+git checkout v1.1-revision2        # a "detached HEAD" notice is expected and harmless
+
+# 2. Create the pinned Python environment (first run takes several minutes)
+conda env create -f environment.yml
+conda activate wildfire            # Python 3.10, TensorFlow/Keras 2.15, exact pins: environment.lock.yml
+
+# 3. (Optional, R figures only) restore the pinned R packages
+Rscript -e "renv::restore()"       # use Rscript, not R: in PowerShell `R` is an alias for Invoke-History
+
+# 4. Run the smoke test
+python test_reproducibility.py
+```
+
+The smoke test ends with a summary line:
+
+```
+SUMMARY:  <n> pass | <n> warn | 0 fail
+```
+
+- **Fresh clone (code only):** all code checks pass; the large data files are
+  reported as warnings. That is the expected result and confirms the
+  environment is correct.
+- **Full reproduction:** download `data.zip` (~358 MB) and `models.zip`
+  (~71 MB) from the Zenodo record and unpack both into the repository root,
+  then re-run step 4. The test then also reproduces the manuscript's Theil-Sen
+  climate trend values deterministically (seeds fixed at 42) and must end with
+  `0 fail`.
+
+To run the full pipeline afterwards, follow the stage-by-stage index in
+`src/README.md`; the reviewer-oriented walkthrough is `REVIEWER_GUIDE.md`.
+
+### Verify file integrity
+
+`sha256sum` is a Linux/macOS/Git-Bash command (not PowerShell). From the
+repository root:
+
+```bash
+sha256sum -c metadata/checksums_sha256.txt
+```
+
+Every line must print `OK`. The checksum file covers `data/`, `models/`,
+`src/`, `R/` and `notebooks/`, so run it after unpacking the Zenodo archives.
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `conda : The term 'conda' is not recognized` | plain PowerShell/CMD | use the **Anaconda PowerShell Prompt**, or install Miniconda first |
+| `R -e ...` does nothing or errors | in PowerShell, `R` aliases `Invoke-History` | use `Rscript -e "renv::restore()"` |
+| `python` opens the Microsoft Store | Windows app-alias stub | activate the conda env first (`conda activate wildfire`) |
+| `sha256sum` not found on Windows | not a PowerShell command | run it in **Git Bash** (installed with Git) |
+| smoke test warns about missing data files | fresh clone without archives | expected; download `data.zip` / `models.zip` from Zenodo for the full check |
+| `detached HEAD` notice after `git checkout` | normal for tag checkouts | nothing to fix |
 
 ## Coordinate reference system
 
@@ -55,33 +150,6 @@ US FSim); W3C CSVW JSON-LD dictionaries; Citation File Format 1.2 (`CITATION.cff
 DataCite via Zenodo; SHA-256 checksums. These records follow the ISO 19115-2 schema
 (ISO-aligned); no formal certification is claimed. Organised per FAIR principles.
 
-Verify integrity (Linux, macOS or Git Bash on Windows - `sha256sum` is not a
-PowerShell command):
-```bash
-sha256sum -c metadata/checksums_sha256.txt   # run from the package root
-```
-
-## Reproducing the analysis
-
-**Prerequisites:** Git and Miniconda (https://docs.conda.io). Optional, for the
-R-based figures only: R (>= 4.2). On Windows, run the commands below in the
-**Anaconda PowerShell Prompt** (plain PowerShell does not know `conda`).
-
-```bash
-git clone https://github.com/Saadkhan32/wildfire-bc-bilstm-pso.git
-cd wildfire-bc-bilstm-pso
-git checkout v1.1-revision2             # "detached HEAD" notice is expected
-conda env create -f environment.yml     # first run takes several minutes; pinned versions: environment.lock.yml
-conda activate wildfire
-Rscript -e "renv::restore()"            # optional (R figures); in PowerShell plain `R` is an alias and will not work
-python test_reproducibility.py          # smoke test - should end "0 fail"
-```
-
-The smoke test passes in code-only mode with warnings for the data files. For
-the full check - including the deterministic reproduction of the manuscript's
-Theil-Sen trend values - download `data.zip` and `models.zip` from the Zenodo
-record and unpack them into the repository root first. Seeds are fixed (42).
-
 ## Licensing
 
 | Component | Licence |
@@ -95,8 +163,8 @@ record and unpack them into the repository root first. Seeds are fixed (42).
 Cite the article and the archive (machine-readable: `CITATION.cff`):
 
 > Khan, M.S., Farooque, A.A., Al-Mughrabi, T., Malekian, R., Wang, X., Esau, T.J.,
-> Uz Zaman, Q. (2026). Geospatial Deep Learning and SHAP-Based Explanation for
-> Wildfire Susceptibility and Exposure Assessment in Western Canada.
+> Uz Zaman, Q. (2026). Geospatial Deep Learning and SHAP-Based Explainable AI for
+> Wildfire Susceptibility and Exposure Mapping in Western Canada.
 > *Ecological Informatics*.
 >
 > Khan, M.S. et al. (2026). wildfire-bc-bilstm-pso (v1.1). Zenodo.

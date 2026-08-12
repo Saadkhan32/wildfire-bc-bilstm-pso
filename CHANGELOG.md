@@ -5,7 +5,9 @@
   authors' final versions (Fig2_in_manuscript; LSTM_Final, BiLSTM_Final and
   PSO_LightPalette_with_Legend panels), each as editable PPTX with vector PDF
   and 400 dpi PNG exports (`figs/manuscript_R2/`).
-- README: prerequisites and PowerShell-safe reproduction commands.
+- README: rewritten for clarity - study overview, step-by-step reproduction
+  guide with expected outputs, troubleshooting table, DOI badges, and the
+  version DOI of the archived release.
 
 ## v1.1.2 - 2026-08-12
 - Smoke test (test_reproducibility.py) rewritten for the actual package layout
