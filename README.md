@@ -73,27 +73,40 @@ environment.yml / environment.lock.yml / renv.lock   (pinned environments)
 | Miniconda (or Anaconda) | any recent | https://docs.conda.io — provides Python 3.10 via `environment.yml` |
 | R | ≥ 4.2 | **optional** — only for the R-based figures |
 
-On Windows, run every command below in the **Anaconda PowerShell Prompt**
+On Windows, open the **Anaconda Prompt** or **Anaconda PowerShell Prompt**
 (Start menu → Anaconda). Plain PowerShell and CMD do not know `conda`.
 
 ### Step by step
 
-```bash
-# 1. Get the code and switch to the archived version
+Each command is explained below the block; paste the commands exactly as
+written, one at a time.
+
+```
 git clone https://github.com/Saadkhan32/wildfire-bc-bilstm-pso.git
 cd wildfire-bc-bilstm-pso
-git checkout v1.1-revision2        # a "detached HEAD" notice is expected and harmless
-
-# 2. Create the pinned Python environment (first run takes several minutes)
+git checkout v1.1-revision2
 conda env create -f environment.yml
-conda activate wildfire            # Python 3.10, TensorFlow/Keras 2.15, exact pins: environment.lock.yml
-
-# 3. (Optional, R figures only) restore the pinned R packages
-Rscript -e "renv::restore()"       # use Rscript, not R: in PowerShell `R` is an alias for Invoke-History
-
-# 4. Run the smoke test
+conda activate wildfire
 python test_reproducibility.py
 ```
+
+1. `git clone` + `cd` — download the repository (~270 MB) and enter it.
+2. `git checkout v1.1-revision2` — switch to the exact version archived on
+   Zenodo and used in the paper. Git prints a "detached HEAD" notice; that is
+   normal for tag checkouts and nothing needs fixing.
+3. `conda env create` — build the pinned Python 3.10 environment
+   (TensorFlow/Keras 2.15; exact versions in `environment.lock.yml`). The
+   first run takes several minutes.
+4. `conda activate wildfire` — switch into that environment.
+5. `python test_reproducibility.py` — run the smoke test (next section).
+
+Optional, only if you want to rebuild the R-based figures (requires R ≥ 4.2):
+
+```
+Rscript -e "renv::restore()"
+```
+
+Use `Rscript`, not `R` — in PowerShell, `R` is an alias for `Invoke-History`.
 
 The smoke test ends with a summary line:
 
@@ -134,6 +147,7 @@ Every line must print `OK`. The checksum file covers `data/`, `models/`,
 | `python` opens the Microsoft Store | Windows app-alias stub | activate the conda env first (`conda activate wildfire`) |
 | `sha256sum` not found on Windows | not a PowerShell command | run it in **Git Bash** (installed with Git) |
 | smoke test warns about missing data files | fresh clone without archives | expected; download `data.zip` / `models.zip` from Zenodo for the full check |
+| `'#' is not recognized...` / `error: pathspec '#'` | comment lines pasted into CMD, where `#` is not a comment | paste only the commands, without any `#` lines |
 | `detached HEAD` notice after `git checkout` | normal for tag checkouts | nothing to fix |
 
 ## Coordinate reference system
