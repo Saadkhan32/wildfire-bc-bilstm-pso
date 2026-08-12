@@ -205,7 +205,7 @@ Every line must print `OK`. The checksum file covers `data/`, `models/`,
 | `R -e ...` does nothing or errors | in PowerShell, `R` aliases `Invoke-History` | use `Rscript -e "renv::restore()"` |
 | `python` opens the Microsoft Store | Windows app-alias stub | activate the conda env first (`conda activate wildfire`) |
 | `'src' is not recognized...` when running a script | Windows does not execute `.py` files by path alone | prefix with `python`, e.g. `python src\build_roc_train_test.py` |
-| nested `data\data\` folder after extracting | Explorer's "Extract All…" adds a wrapper folder named after the zip | delete the nested folder and re-extract with the `tar` commands above, or set the extraction destination to the repository root |
+| nested `data\data\` or `models\models\` folder after extracting | Explorer's "Extract All…" adds a wrapper folder named after the zip | delete the nested folder and re-extract with the `tar` commands above, or set the extraction destination to the repository root |
 | `sha256sum` not found on Windows | not a PowerShell command | run it in **Git Bash** (installed with Git) |
 | smoke test warns about missing data files | fresh clone without archives | expected; download `data.zip` / `models.zip` from Zenodo for the full check |
 | `'#' is not recognized...` / `error: pathspec '#'` | comment lines pasted into CMD, where `#` is not a comment | paste only the commands, without any `#` lines |
