@@ -42,10 +42,15 @@ to that tag).
 
 ## Two ways to use this package
 
-The Zenodo record contains four archives. **They do not overlap with this
-repository**: no file tracked in git is also inside `data.zip` or
+The Zenodo record contains four archives. **They do not collide with this
+repository**: no file path tracked in git also exists inside `data.zip` or
 `models.zip`, so the archives unpack over a clone cleanly, with no
 "replace file?" prompts.
+
+A fresh clone already contains a small `data/` folder. That is intentional:
+it holds the lightweight, git-tracked script inputs (monthly climate CSVs,
+LISA layers, fire subsets) that are *not* inside `data.zip`. `models/` does
+not exist in a clone at all — `models.zip` creates it.
 
 | Archive | Contains | Needed by |
 |---|---|---|
@@ -61,11 +66,33 @@ unpack `code.zip` or `metadata.zip` over a clone — they are complete copies of
 the code and metadata for Path B users and would only duplicate what git
 already gave you.
 
+Each archive contains a single top-level folder (`data/` or `models/`), so
+unpack them *directly into the repository root*. On Windows, the safest way
+(no wrapper folder, no prompts) is the built-in `tar`, run from the
+repository folder:
+
+```
+tar -xf "%USERPROFILE%\Downloads\data.zip"
+tar -xf "%USERPROFILE%\Downloads\models.zip"
+```
+
+If you use Explorer's "Extract All…" instead, set the destination to the
+repository folder itself — not the suggested new subfolder — otherwise you
+end up with a nested `data\data\` folder.
+
 **Path B — Zenodo only (no git needed).** Download all four archives and the
 loose documentation files from the Zenodo record and unpack the archives side
 by side into one folder. `code.zip` provides `src/`, `R/` and `notebooks/`;
-`metadata.zip` provides `metadata/`. The result is the same tree as Path A,
+`metadata.zip` provides `metadata/`. Everything the archives deliver is
 verifiable with `metadata/checksums_sha256.txt`.
+
+*Path B note:* a few scripts read five small monthly-climate CSVs from
+`data/` directly. Four of them are byte-identical to the copies shipped in
+`data/climate/` (copy them up one level); the fifth,
+`BC_2000_2024_monthly_climate_wide.csv`, additionally carries the
+relative-humidity column used by the Figure 12 script — take that one from
+the repository (browse or download the tag archive on GitHub, no git
+required).
 
 ## Repository layout
 
@@ -178,6 +205,7 @@ Every line must print `OK`. The checksum file covers `data/`, `models/`,
 | `R -e ...` does nothing or errors | in PowerShell, `R` aliases `Invoke-History` | use `Rscript -e "renv::restore()"` |
 | `python` opens the Microsoft Store | Windows app-alias stub | activate the conda env first (`conda activate wildfire`) |
 | `'src' is not recognized...` when running a script | Windows does not execute `.py` files by path alone | prefix with `python`, e.g. `python src\build_roc_train_test.py` |
+| nested `data\data\` folder after extracting | Explorer's "Extract All…" adds a wrapper folder named after the zip | delete the nested folder and re-extract with the `tar` commands above, or set the extraction destination to the repository root |
 | `sha256sum` not found on Windows | not a PowerShell command | run it in **Git Bash** (installed with Git) |
 | smoke test warns about missing data files | fresh clone without archives | expected; download `data.zip` / `models.zip` from Zenodo for the full check |
 | `'#' is not recognized...` / `error: pathspec '#'` | comment lines pasted into CMD, where `#` is not a comment | paste only the commands, without any `#` lines |

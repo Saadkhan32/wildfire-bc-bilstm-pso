@@ -7,7 +7,12 @@
   without overwrite prompts; .gitignore extended to keep git status clean
   after unpacking.
 - README: "Two ways to use this package" - archive-by-archive table and
-  separate GitHub (data.zip + models.zip only) and Zenodo-only paths.
+  separate GitHub (data.zip + models.zip only) and Zenodo-only paths;
+  Windows extraction guidance (tar; avoiding Explorer's nested-folder
+  wrapper) and a note on the five git-tracked monthly-climate CSVs.
+- Removed empty-folder placeholders (models/.gitkeep,
+  data/processed/.gitkeep): a clone now contains no models folder at all
+  until models.zip is unpacked.
 - Tag v1.1-revision2 moved to this state so the tagged tree shows the
   authors' final figures; the archived code.zip remains byte-identical to
   the tag (src/, R/, notebooks/ unchanged).
