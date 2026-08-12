@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import arcpy
-REPO   = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\revision_c8c11"
+REPO   = os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso\revision_c8c11")
 INPUT  = os.path.join(REPO, "01_Input_Data")
 OUTPUT = os.path.join(REPO, "02_GIS_Output")
 BC_BOUNDARY = os.path.join(INPUT, "bc_boundary.shp")

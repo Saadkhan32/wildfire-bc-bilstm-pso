@@ -11,11 +11,11 @@ print("STEP 1 / 5: Set up folder structure inside your GitHub repo")
 print("=" * 60)
 print()
 print("A folder picker will open. Pick your GitHub repo root, i.e.")
-print("  C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso")
+print(os.path.expandvars("  %USERPROFILE%\\Documents\\wildfire-bc-bilstm-pso"))
 print()
 repo = pick_folder(
     "STEP 1: pick your GitHub repo root",
-    initialdir=r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso",
+    initialdir=os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso"),
 )
 if not repo:
     print("CANCELLED."); sys.exit(1)

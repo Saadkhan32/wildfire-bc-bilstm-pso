@@ -3,7 +3,7 @@
 Code, data, and metadata supporting **Khan et al. (2026)**, *Ecological Informatics*
 (manuscript **ECOINF-D-26-01275**):
 
-> **An Interpretable Deep Learning Framework for Wildfire Susceptibility and Exposure Assessment in Western Canada**
+> **Geospatial Deep Learning and SHAP-Based Explainable AI for Wildfire Susceptibility and Exposure Mapping in Western Canada**
 
 ## Where to find what
 

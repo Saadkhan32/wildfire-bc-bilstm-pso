@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pandas as pd
 from pathlib import Path
-PROJECT_ROOT      = Path(r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso")
+PROJECT_ROOT      = Path(os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso"))
 SEED_FILES_FOLDER = Path(r"G:\Wildfire_RandomSeed_Sensitivity\02_Seed_Tables")
 OUT_ROOT          = Path(r"G:\Wildfire_RandomSeed_Sensitivity\03_Model_Results")
 SEED_FOR_CHECKS   = 42

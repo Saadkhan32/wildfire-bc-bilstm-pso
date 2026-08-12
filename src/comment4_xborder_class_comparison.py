@@ -9,7 +9,7 @@ from shapely.geometry import Polygon, Point
 from scipy.stats import spearmanr
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-REPO     = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso"
+REPO     = os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso")
 BC_SUS   = os.path.join(REPO, "data", "BC_susceptibility_500m.tif")
 WHP      = os.path.join(REPO, "revision_c8c11", "01_Input_Data",
                         "US_fire_products", "WHP", "WHP2023_classified_conus.tif")

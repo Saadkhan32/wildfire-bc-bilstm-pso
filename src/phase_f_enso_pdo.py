@@ -1,9 +1,10 @@
+import os
 from pathlib import Path
 import numpy as np, pandas as pd
 import matplotlib.pyplot as plt
 import geopandas as gpd
 from scipy.stats import pearsonr, spearmanr
-ROOT = Path(r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso")
+ROOT = Path(os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso"))
 DATA_RAW = ROOT / "data" / "raw"
 DATA_PROC = ROOT / "data" / "processed"
 FIGS = ROOT / "figs"

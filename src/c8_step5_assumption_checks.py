@@ -33,7 +33,7 @@ if not model_dir:
     print("CANCELLED."); sys.exit(1)
 print(f"  model dir: {model_dir}")
 print("\nDialog 3 of 3: Pick your project repo root")
-print("(probably C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso)")
+print(os.path.expandvars("(probably %USERPROFILE%\\Documents\\wildfire-bc-bilstm-pso)"))
 repo_root = pick_folder("STEP 5 dialog 3: pick repo root")
 if not repo_root:
     print("CANCELLED."); sys.exit(1)

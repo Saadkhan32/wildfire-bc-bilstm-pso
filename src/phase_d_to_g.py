@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import sys
 import json
 import warnings
@@ -537,7 +538,7 @@ def main():
     print("=" * 75)
     root = ask_directory(
         "Pick project root folder (wildfire-bc-bilstm-pso)",
-        initial=r"C:\Users\saadz\Documents",
+        initial=os.path.expandvars(r"%USERPROFILE%\Documents"),
     )
     if not root:
         print("No project root selected. Exiting.")

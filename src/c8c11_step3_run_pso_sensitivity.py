@@ -49,7 +49,7 @@ if not out_root:
     print("CANCELLED."); sys.exit(1)
 print(f"  output root: {out_root}")
 print("\nDialog 4 of 4: Pick the Python interpreter to use.")
-print("(your wildfire conda env's python.exe; typically C:\\Users\\saadz\\")
+print(os.path.expandvars("(your wildfire conda env's python.exe; typically %USERPROFILE%\\"))
 print(" anaconda3\\envs\\wildfire\\python.exe or similar)")
 python_exe = pick_file("STEP 3 dialog 4: pick python.exe",
                         [("Executable", "python.exe"), ("All", "*.*")])

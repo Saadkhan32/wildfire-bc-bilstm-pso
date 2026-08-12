@@ -4,7 +4,7 @@ import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 from sklearn.metrics import roc_auc_score, average_precision_score
-REPO     = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso"
+REPO     = os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso")
 COMBO    = "BiLSTM_PSO/thr70/seed42"
 OOF_CSV  = os.path.join(REPO, "revision_c8c11", "05_Model_Results",
                         COMBO, "cv_oof_predictions.csv")

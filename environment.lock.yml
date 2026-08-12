@@ -386,4 +386,4 @@ dependencies:
       - werkzeug==3.1.8
       - wrapt==1.14.2
       - xarray==2025.6.1
-prefix: C:\Users\saadz\anaconda3\envs\wildfire
+prefix: %USERPROFILE%\anaconda3\envs\wildfire

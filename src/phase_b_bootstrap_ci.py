@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -65,7 +66,7 @@ for i in range(N_BOOT):
     boot["F1"].append(f1_score(yt, yp))
     boot["Precision"].append(precision_score(yt, yp))
     boot["Recall"].append(recall_score(yt, yp))
-TABLES = Path(r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\tables")
+TABLES = Path(os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso\tables"))
 TABLES.mkdir(exist_ok=True)
 rows = []
 print("\nBOOTSTRAP 95% CIs:")

@@ -11,8 +11,8 @@ try:
 except Exception:
     pass
 CANDIDATE_WILDFIRE_PATHS = [
-    r"C:\Users\saadz\anaconda3\envs\wildfire\python.exe",
-    r"C:\Users\saadz\miniconda3\envs\wildfire\python.exe",
+    os.path.expandvars(r"%USERPROFILE%\anaconda3\envs\wildfire\python.exe"),
+    os.path.expandvars(r"%USERPROFILE%\miniconda3\envs\wildfire\python.exe"),
     r"C:\ProgramData\anaconda3\envs\wildfire\python.exe",
     r"C:\ProgramData\miniconda3\envs\wildfire\python.exe",
     r"C:\anaconda3\envs\wildfire\python.exe",

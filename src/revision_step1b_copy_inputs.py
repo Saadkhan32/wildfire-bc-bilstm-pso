@@ -44,7 +44,7 @@ print("=" * 60)
 print("\nDialog 1: pick your repo root (wildfire-bc-bilstm-pso)")
 repo = pick_folder(
     "STEP 1b dialog 1: pick repo root",
-    init=r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso",
+    init=os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso"),
 )
 if not repo:
     print("CANCELLED."); sys.exit(1)

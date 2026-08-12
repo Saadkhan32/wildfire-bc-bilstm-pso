@@ -16,7 +16,7 @@ except ImportError as e:
     sys.exit("Missing package: {0}\nInstall into the env you ran your last script "
              "from, e.g.:  conda install -c conda-forge rasterio geopandas scipy "
              "matplotlib".format(e))
-REPO = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\revision_c8c11"
+REPO = os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso\revision_c8c11")
 DEF_US_BP    = os.path.join(REPO, "01_Input_Data", "borders", "US_burn_probability", "BP_WA_ID_MT.tif")
 DEF_BC_STRIP = os.path.join(REPO, "02_GIS_Output", "bc_strip.shp")
 DEF_US_STRIP = os.path.join(REPO, "02_GIS_Output", "us_strip.shp")

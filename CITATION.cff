@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software or data, please cite both the article and the archived release."
-title: "wildfire-bc-bilstm-pso: code, data and metadata for an interpretable deep learning framework for wildfire susceptibility and exposure assessment in Western Canada"
+title: "wildfire-bc-bilstm-pso: geospatial deep learning and SHAP-based explainable AI for wildfire susceptibility and exposure mapping in Western Canada"
 abstract: >-
   Reproducible pipeline, derived geospatial data, and ISO 19115-2 / CSVW metadata for a
   BiLSTM-PSO wildfire susceptibility and exposure framework for British Columbia, Canada
@@ -54,7 +54,7 @@ authors:
     affiliation: "Dalhousie University"
 preferred-citation:
   type: article
-  title: "An Interpretable Deep Learning Framework for Wildfire Susceptibility and Exposure Assessment in Western Canada"
+  title: "Geospatial Deep Learning and SHAP-Based Explainable AI for Wildfire Susceptibility and Exposure Mapping in Western Canada"
   journal: "Ecological Informatics"
   year: 2026
   authors:

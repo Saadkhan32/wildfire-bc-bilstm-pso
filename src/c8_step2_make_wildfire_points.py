@@ -23,7 +23,7 @@ print("(probably under <your-repo>\\data\\processed\\fires_geq_70ha.shp)")
 fires = pick_file(
     "STEP 2 dialog 1: Pick fires_geq_70ha.shp",
     [("Shapefile", "*.shp")],
-    initialdir=r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\data\processed",
+    initialdir=os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso\data\processed"),
 )
 if not fires:
     print("CANCELLED."); sys.exit(1)
@@ -57,7 +57,7 @@ print(f"Output: {out_shp}")
 print("=" * 60)
 print()
 print("Next: run STEP 3 inside ArcGIS Pro Python window:")
-print(r"  exec(open(r'C:\Users\saadz\Documents\wildfire-bc-bilstm-pso\src\c8_step3_generate_pseudo_absence.py').read())")
+print(os.path.expandvars(r"  exec(open(r'%USERPROFILE%\Documents\wildfire-bc-bilstm-pso\src\c8_step3_generate_pseudo_absence.py').read())"))
 try:
     a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
     messagebox.showinfo(

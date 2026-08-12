@@ -40,7 +40,7 @@ def confirm(title: str, msg: str) -> bool:
     root.destroy()
     return ans
 DEFAULT_SRC_RASTERS = r"G:\Deep learning for wildfire susceptibility mapping\BC Rasampled 1500m Rasters"
-DEFAULT_PROJ_ROOT   = r"C:\Users\saadz\Documents\wildfire-bc-bilstm-pso"
+DEFAULT_PROJ_ROOT   = os.path.expandvars(r"%USERPROFILE%\Documents\wildfire-bc-bilstm-pso")
 DEFAULT_NFDB        = r"G:\Deep learning for wildfire susceptibility mapping"
 CATEGORICAL_KEYWORDS = ("lulc", "aspect")
 THRESHOLDS_HA = (50, 70, 100)

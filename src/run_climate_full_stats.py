@@ -113,7 +113,7 @@ def pick_project_root():
     _tk()
     p = filedialog.askdirectory(
         title="Pick project root (wildfire-bc-bilstm-pso)",
-        initialdir=r"C:\Users\saadz\Documents",
+        initialdir=os.path.expandvars(r"%USERPROFILE%\Documents"),
     )
     return Path(p) if p else None
 def remerge(paths):

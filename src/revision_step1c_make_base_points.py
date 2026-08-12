@@ -161,8 +161,7 @@ print(f"  {out_fire}")
 print(f"  {out_pa}")
 print()
 print("If the preview looks good, run the full Step 2 to produce 12 datasets:")
-print("  exec(open(r\"C:\\Users\\saadz\\Documents\\wildfire-bc-bilstm-pso\\"
-      "src\\revision_step2_arcgis_generate.py\").read())")
+print(r'  exec(open(r"<repo-root>\src\revision_step2_arcgis_generate.py").read())')
 try:
     a = tk.Tk(); a.withdraw(); a.attributes("-topmost", True)
     messagebox.showinfo("STEP 1c preview done",
