@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.0 - 2026-08-12
+- Zenodo archives restructured (new Zenodo version): data.zip, models.zip and
+  metadata.zip now contain the folder contents directly, without a wrapper
+  folder, so Windows "Extract All" with its default destination yields exactly
+  one correctly named folder (no more data/data or models/models nesting).
+  code.zip is unchanged and remains byte-identical to git tag v1.1-revision2
+  (tag name retained as cited in the manuscript).
+- data.zip: data/climate/BC_2000_2024_monthly_climate_wide.csv updated to the
+  current version carrying the avg_relative_humidity column required by the
+  Figure 12 script; the archive is now self-sufficient for Zenodo-only users.
+- metadata/checksums_sha256.txt updated accordingly.
+- README: extraction instructions rewritten for the flat archives.
+
 ## v1.1.4 - 2026-08-12
 - No-overlap packaging: the six files that existed both in git and in the
   Zenodo data.zip (data/README.md and the >=70 ha fire-perimeter shapefile)

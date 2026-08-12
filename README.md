@@ -66,19 +66,25 @@ unpack `code.zip` or `metadata.zip` over a clone — they are complete copies of
 the code and metadata for Path B users and would only duplicate what git
 already gave you.
 
-Each archive contains a single top-level folder (`data/` or `models/`), so
-unpack them *directly into the repository root*. On Windows, the safest way
-(no wrapper folder, no prompts) is the built-in `tar`, run from the
-repository folder:
+Each archive contains the folder *contents* directly — there is no wrapper
+folder inside the zip. That means Windows' "Extract All…" with its **default
+destination** produces exactly one correctly named folder:
+
+1. Right-click `data.zip` → Extract All… → keep the suggested destination.
+   You get a single folder named `data`.
+2. Move that `data` folder into the repository root (the folder containing
+   this README). Windows merges it with the small git-tracked `data` folder;
+   no file exists in both, so there are no "replace?" prompts.
+3. Repeat for `models.zip` → a `models` folder → move it into the repository
+   root.
+
+Command-line alternative, from the repository root:
 
 ```
-tar -xf "%USERPROFILE%\Downloads\data.zip"
-tar -xf "%USERPROFILE%\Downloads\models.zip"
+tar -xf "%USERPROFILE%\Downloads\data.zip" -C data
+mkdir models
+tar -xf "%USERPROFILE%\Downloads\models.zip" -C models
 ```
-
-If you use Explorer's "Extract All…" instead, set the destination to the
-repository folder itself — not the suggested new subfolder — otherwise you
-end up with a nested `data\data\` folder.
 
 **Path B — Zenodo only (no git needed).** Download all four archives and the
 loose documentation files from the Zenodo record and unpack the archives side
@@ -87,12 +93,8 @@ by side into one folder. `code.zip` provides `src/`, `R/` and `notebooks/`;
 verifiable with `metadata/checksums_sha256.txt`.
 
 *Path B note:* a few scripts read five small monthly-climate CSVs from
-`data/` directly. Four of them are byte-identical to the copies shipped in
-`data/climate/` (copy them up one level); the fifth,
-`BC_2000_2024_monthly_climate_wide.csv`, additionally carries the
-relative-humidity column used by the Figure 12 script — take that one from
-the repository (browse or download the tag archive on GitHub, no git
-required).
+`data/` directly; copy them from `data/climate/` up one level into `data/`
+after unpacking.
 
 ## Repository layout
 
@@ -242,7 +244,7 @@ Cite the article and the archive (machine-readable: `CITATION.cff`):
 > Wildfire Susceptibility and Exposure Mapping in Western Canada.
 > *Ecological Informatics*.
 >
-> Khan, M.S. et al. (2026). wildfire-bc-bilstm-pso (v1.1). Zenodo.
+> Khan, M.S. et al. (2026). wildfire-bc-bilstm-pso. Zenodo.
 > https://doi.org/10.5281/zenodo.20389083
 
 ## Contact
