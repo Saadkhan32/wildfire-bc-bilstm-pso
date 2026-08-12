@@ -55,23 +55,32 @@ US FSim); W3C CSVW JSON-LD dictionaries; Citation File Format 1.2 (`CITATION.cff
 DataCite via Zenodo; SHA-256 checksums. These records follow the ISO 19115-2 schema
 (ISO-aligned); no formal certification is claimed. Organised per FAIR principles.
 
-Verify integrity:
+Verify integrity (Linux, macOS or Git Bash on Windows - `sha256sum` is not a
+PowerShell command):
 ```bash
 sha256sum -c metadata/checksums_sha256.txt   # run from the package root
 ```
 
 ## Reproducing the analysis
 
+**Prerequisites:** Git and Miniconda (https://docs.conda.io). Optional, for the
+R-based figures only: R (>= 4.2). On Windows, run the commands below in the
+**Anaconda PowerShell Prompt** (plain PowerShell does not know `conda`).
+
 ```bash
 git clone https://github.com/Saadkhan32/wildfire-bc-bilstm-pso.git
 cd wildfire-bc-bilstm-pso
-git checkout v1.1-revision2
-conda env create -f environment.yml     # pinned versions: environment.lock.yml
+git checkout v1.1-revision2             # "detached HEAD" notice is expected
+conda env create -f environment.yml     # first run takes several minutes; pinned versions: environment.lock.yml
 conda activate wildfire
-R -e "renv::restore()"
+Rscript -e "renv::restore()"            # optional (R figures); in PowerShell plain `R` is an alias and will not work
+python test_reproducibility.py          # smoke test - should end "0 fail"
 ```
-Download `data.zip` and `models.zip` from the Zenodo record and unpack into `data/`
-and `models/`. Seeds are fixed (42); `test_reproducibility.py` re-checks headline metrics.
+
+The smoke test passes in code-only mode with warnings for the data files. For
+the full check - including the deterministic reproduction of the manuscript's
+Theil-Sen trend values - download `data.zip` and `models.zip` from the Zenodo
+record and unpack them into the repository root first. Seeds are fixed (42).
 
 ## Licensing
 
