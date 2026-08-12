@@ -71,3 +71,22 @@ revision_c8c11/05_Model_Results/**/static_preprocessor.joblib
 
 # Phase E1: BC susceptibility outputs (allowed despite *.tif exclusion above)
 !revision_c8c11/02_GIS_Output/BC_susceptibility_*.tif
+
+# local packaging / working artefacts (not part of the published repo)
+ZENODO_upload/
+publication_package/
+wildfire-bc-bilstm-pso-clean/
+*_FOR_ZENODO.zip
+wildfire-bc-bilstm-pso-clean.zip
+models_for_zenodo.zip
+ECOINF-D-26-01275R2_*.docx
+Manuscript_R*.docx
+_RESUBMISSION_STEPS_local.md
+_archive_local/
+reviewer_response_*/
+revision_c8c11/
+check with fable/
+_efffig/
+docs/manuscript_drafts_local/
+~$*.docx
+*.sr.lock

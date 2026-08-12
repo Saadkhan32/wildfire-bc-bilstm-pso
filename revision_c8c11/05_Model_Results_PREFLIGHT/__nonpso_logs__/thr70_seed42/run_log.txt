@@ -1,9 +1,0 @@
-WARNING:tensorflow:From C:\Users\saadz\anaconda3\envs\wildfire\lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
-
-[non-PSO CLI] data: C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11/03_Training_Tables\training_thr70_seed42.csv
-[non-PSO CLI] thr=70  seed=42  epochs=3
-[non-PSO CLI] rows=3984  fire=1992  nonfire=1992  unique groups=459
-  SKIP LSTM: already done -> C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11\05_Model_Results_PREFLIGHT\LSTM\thr70\seed42\metrics_summary.json
-  SKIP BILSTM: already done -> C:/Users/saadz/Documents/wildfire-bc-bilstm-pso/revision_c8c11\05_Model_Results_PREFLIGHT\BILSTM\thr70\seed42\metrics_summary.json
-
-[non-PSO CLI] done.

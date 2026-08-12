@@ -1,20 +1,63 @@
 {
-  "title": "wildfire-bc-bilstm-pso: An Interpretable Deep Learning Framework for Wildfire Susceptibility and Exposure Assessment in Western Canada",
-  "description": "Code, data and metadata supporting Khan et al. (2026), Ecological Informatics (ECOINF-D-26-01275). BiLSTM-PSO modelling pipeline, ISO 19115-2 metadata, CSVW JSON-LD data dictionaries, spatial-block cross-validation, SHAP interpretability, and a cross-border benchmark against US Wildfire Hazard Potential, LANDFIRE Burn Probability and Wildfire Risk to Communities products. All spatial layers in NAD 1983 BC Environment Albers (EPSG:3005). MIT-licensed code; CC-BY 4.0 derived data.",
+  "title": "wildfire-bc-bilstm-pso: Geospatial Deep Learning and SHAP-Based Explanation for Wildfire Susceptibility and Exposure Assessment in Western Canada",
+  "description": "<p>Code, derived data, trained model weights, and standards-compliant metadata supporting Khan et al. (2026), <i>Ecological Informatics</i> (ECOINF-D-26-01275).</p><p><b>Contents:</b> BiLSTM and BiLSTM-PSO modelling pipeline; processed wildfire and non-fire point dataset; conditioning-factor and susceptibility rasters; per-model probability tables; trained Keras weights; SHAP explanation outputs; spatial block cross-validation; figure and table generation scripts.</p><p><b>Metadata:</b> ISO 19115-2 XML for every derived raster, W3C CSVW (JSON-LD) dictionaries for every tabular dataset, and SHA-256 checksums for all files.</p><p><b>Coordinate reference system:</b> NAD83 / BC Albers (EPSG:3005), 1500 m grid.</p><p><b>Licensing:</b> record licence MIT (code); code MIT; author-generated derived data CC-BY 4.0. Third-party input datasets are NOT redistributed; each is documented with provider, access link and licence in DATA_SOURCES.md.</p>",
   "upload_type": "software",
-  "creators": [
-    {"name": "Khan, Muhammad S.", "affiliation": "University of Prince Edward Island"},
-    {"name": "Farooque, Aitazaz A.", "affiliation": "University of Prince Edward Island", "orcid": "0000-0000-0000-0000"},
-    {"name": "Al-Mughrabi, Tatiana", "affiliation": "University of Prince Edward Island"},
-    {"name": "Malekian, Raheleh", "affiliation": "University of Prince Edward Island"},
-    {"name": "Wang, Xander", "affiliation": "University of Prince Edward Island"},
-    {"name": "Esau, Travis J.", "affiliation": "Dalhousie University"},
-    {"name": "Uz Zaman, Qamar", "affiliation": "Dalhousie University"}
-  ],
-  "keywords": ["wildfire susceptibility", "interpretable deep learning", "BiLSTM", "PSO", "SHAP", "British Columbia", "FAIR", "ISO 19115", "EPSG:3005"],
-  "license": "MIT",
   "access_right": "open",
+  "license": "MIT",
   "language": "eng",
-  "version": "1.0.0"
+  "version": "1.1.0",
+  "creators": [
+    {
+      "name": "Khan, Muhammad S.",
+      "affiliation": "University of Prince Edward Island"
+    },
+    {
+      "name": "Farooque, Aitazaz A.",
+      "affiliation": "University of Prince Edward Island",
+      "orcid": "0000-0002-5353-6752"
+    },
+    {
+      "name": "Al-Mughrabi, Tatiana",
+      "affiliation": "University of Prince Edward Island"
+    },
+    {
+      "name": "Malekian, Raheleh",
+      "affiliation": "University of Prince Edward Island"
+    },
+    {
+      "name": "Wang, Xander",
+      "affiliation": "University of Prince Edward Island",
+      "orcid": "0000-0002-3718-3416"
+    },
+    {
+      "name": "Esau, Travis J.",
+      "affiliation": "Dalhousie University"
+    },
+    {
+      "name": "Uz Zaman, Qamar",
+      "affiliation": "Dalhousie University"
+    }
+  ],
+  "keywords": [
+    "wildfire susceptibility",
+    "exposure assessment",
+    "geospatial deep learning",
+    "BiLSTM",
+    "particle swarm optimization",
+    "SHAP",
+    "explainable AI",
+    "British Columbia",
+    "FAIR",
+    "ISO 19115-2",
+    "CSVW",
+    "EPSG:3005"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Saadkhan32/wildfire-bc-bilstm-pso",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "notes": "AUTHOR INPUT REQUIRED: supply ORCIDs for Khan, Al-Mughrabi, Malekian, Esau and Uz Zaman (Farooque and Wang verified from record 10.5281/zenodo.20820293). After acceptance, add the article DOI as a related_identifier with relation 'isSupplementTo'."
 }
-

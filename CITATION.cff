@@ -1,16 +1,43 @@
 cff-version: 1.2.0
-title: "wildfire-bc-bilstm-pso"
-message: "If you use this software, please cite both the article and the archived software (DOI)."
+message: "If you use this software or data, please cite both the article and the archived release."
+title: "wildfire-bc-bilstm-pso: geospatial deep learning and SHAP-based explanation for wildfire susceptibility and exposure assessment in British Columbia"
+abstract: >-
+  Reproducible pipeline, derived geospatial data, and ISO 19115-2 / CSVW metadata for a
+  BiLSTM-PSO wildfire susceptibility and exposure framework for British Columbia, Canada
+  (2000-2024). All spatial layers use NAD83 / BC Albers (EPSG:3005) at 1500 m.
 type: software
+version: "1.1.0"
+date-released: "2026-08-11"
+license: MIT
+repository-code: "https://github.com/Saadkhan32/wildfire-bc-bilstm-pso"
+url: "https://doi.org/10.5281/zenodo.20389083"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.20389083"
+    description: "Concept DOI - always resolves to the latest archived version"
+keywords:
+  - wildfire susceptibility
+  - exposure assessment
+  - geospatial deep learning
+  - BiLSTM
+  - particle swarm optimization
+  - SHAP
+  - explainable AI
+  - British Columbia
+  - FAIR
+  - ISO 19115-2
+  - EPSG:3005
 authors:
+  # ORCIDs below verified against the published Zenodo record 10.5281/zenodo.20820293.
+  # AUTHOR INPUT REQUIRED: supply ORCIDs for Khan, Al-Mughrabi, Malekian, Esau and Uz Zaman.
   - family-names: Khan
-    given-names: Muhammad S.
+    given-names: "Muhammad S."
     affiliation: "University of Prince Edward Island"
   - family-names: Farooque
-    given-names: Aitazaz A.
+    given-names: "Aitazaz A."
     email: afarooque@upei.ca
     affiliation: "University of Prince Edward Island"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0000-0002-5353-6752"
   - family-names: Al-Mughrabi
     given-names: Tatiana
     affiliation: "University of Prince Edward Island"
@@ -20,19 +47,30 @@ authors:
   - family-names: Wang
     given-names: Xander
     affiliation: "University of Prince Edward Island"
+    orcid: "https://orcid.org/0000-0002-3718-3416"
   - family-names: Esau
-    given-names: Travis J.
+    given-names: "Travis J."
     affiliation: "Dalhousie University"
-  - family-names: Uz Zaman
+  - family-names: "Uz Zaman"
     given-names: Qamar
     affiliation: "Dalhousie University"
-license: MIT
-repository-code: "https://github.com/Saadkhan32/wildfire-bc-bilstm-pso"
-keywords:
-  - wildfire susceptibility
-  - interpretable deep learning
-  - BiLSTM
-  - particle swarm optimization
-  - SHAP
-  - British Columbia
-
+preferred-citation:
+  type: article
+  title: "Geospatial Deep Learning and SHAP-Based Explanation for Wildfire Susceptibility and Exposure Assessment in Western Canada"
+  journal: "Ecological Informatics"
+  year: 2026
+  authors:
+    - family-names: Khan
+      given-names: "Muhammad S."
+    - family-names: Farooque
+      given-names: "Aitazaz A."
+    - family-names: Al-Mughrabi
+      given-names: Tatiana
+    - family-names: Malekian
+      given-names: Raheleh
+    - family-names: Wang
+      given-names: Xander
+    - family-names: Esau
+      given-names: "Travis J."
+    - family-names: "Uz Zaman"
+      given-names: Qamar

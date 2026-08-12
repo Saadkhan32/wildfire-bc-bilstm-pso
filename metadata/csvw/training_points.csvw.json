@@ -1,0 +1,148 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "../data/training_points_70ha_seed42.csv",
+  "dc:title": "BC wildfire susceptibility modelling dataset (>=70 ha, seed 42)",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dialect": {
+    "header": true,
+    "encoding": "utf-8",
+    "delimiter": ","
+  },
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "UniqueID",
+        "titles": "UniqueID",
+        "datatype": "integer",
+        "dc:description": "Unique point identifier"
+      },
+      {
+        "name": "Longitude",
+        "titles": "Longitude",
+        "datatype": "number",
+        "dc:description": "Longitude of point (decimal degrees (WGS84))"
+      },
+      {
+        "name": "Latitude",
+        "titles": "Latitude",
+        "datatype": "number",
+        "dc:description": "Latitude of point (decimal degrees (WGS84))"
+      },
+      {
+        "name": "Status",
+        "titles": "Status",
+        "datatype": "integer",
+        "dc:description": "Class label (1 = wildfire \u226570 ha, 0 = non-wildfire) (binary)"
+      },
+      {
+        "name": "Aspect",
+        "titles": "Aspect",
+        "datatype": "number",
+        "dc:description": "Terrain aspect (degrees)"
+      },
+      {
+        "name": "Slope",
+        "titles": "Slope",
+        "datatype": "number",
+        "dc:description": "Terrain slope (degrees)"
+      },
+      {
+        "name": "Elevation",
+        "titles": "Elevation",
+        "datatype": "number",
+        "dc:description": "Elevation (SRTM) (m)"
+      },
+      {
+        "name": "TWI",
+        "titles": "TWI",
+        "datatype": "number",
+        "dc:description": "Topographic Wetness Index (index)"
+      },
+      {
+        "name": "Profile_Curvature",
+        "titles": "Profile_Curvature",
+        "datatype": "number",
+        "dc:description": "Profile curvature (1/m)"
+      },
+      {
+        "name": "Plan_Curvature",
+        "titles": "Plan_Curvature",
+        "datatype": "number",
+        "dc:description": "Plan curvature (1/m)"
+      },
+      {
+        "name": "NDVI",
+        "titles": "NDVI",
+        "datatype": "number",
+        "dc:description": "Normalized Difference Vegetation Index (mean) (index)"
+      },
+      {
+        "name": "LULC",
+        "titles": "LULC",
+        "datatype": "string",
+        "dc:description": "Land-use/land-cover class (ESRI/Sentinel-2) (categorical)"
+      },
+      {
+        "name": "Max_Temperature",
+        "titles": "Max_Temperature",
+        "datatype": "number",
+        "dc:description": "Mean maximum temperature (\u00b0C)"
+      },
+      {
+        "name": "Precipitation",
+        "titles": "Precipitation",
+        "datatype": "number",
+        "dc:description": "Mean total precipitation (mm)"
+      },
+      {
+        "name": "WS",
+        "titles": "WS",
+        "datatype": "number",
+        "dc:description": "Mean wind speed (m/s)"
+      },
+      {
+        "name": "Specific_Humidity",
+        "titles": "Specific_Humidity",
+        "datatype": "number",
+        "dc:description": "Mean specific humidity (kg/kg)"
+      },
+      {
+        "name": "AET",
+        "titles": "AET",
+        "datatype": "number",
+        "dc:description": "Actual evapotranspiration (mm)"
+      },
+      {
+        "name": "DSI",
+        "titles": "DSI",
+        "datatype": "number",
+        "dc:description": "Drought Severity Index (index)"
+      },
+      {
+        "name": "Soil_Moisture",
+        "titles": "Soil_Moisture",
+        "datatype": "number",
+        "dc:description": "Soil moisture (mm)"
+      },
+      {
+        "name": "Distance_roads",
+        "titles": "Distance_roads",
+        "datatype": "number",
+        "dc:description": "Euclidean distance to nearest road (m)"
+      },
+      {
+        "name": "Distance_rivers",
+        "titles": "Distance_rivers",
+        "datatype": "number",
+        "dc:description": "Euclidean distance to nearest river (m)"
+      },
+      {
+        "name": "Distance_households",
+        "titles": "Distance_households",
+        "datatype": "number",
+        "dc:description": "Euclidean distance to nearest household (m)"
+      }
+    ],
+    "primaryKey": "UniqueID"
+  }
+}

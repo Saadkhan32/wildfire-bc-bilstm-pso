@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmi:MI_Metadata xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <gmd:fileIdentifier><gco:CharacterString>wildfire-bc-bilstm-pso-dataset</gco:CharacterString></gmd:fileIdentifier>
+  <gmd:language><gco:CharacterString>eng</gco:CharacterString></gmd:language>
+  <gmd:characterSet><gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode></gmd:characterSet>
+  <gmd:hierarchyLevel><gmd:MD_ScopeCode codeListValue="dataset" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode">dataset</gmd:MD_ScopeCode></gmd:hierarchyLevel>
+  <gmd:contact>
+    <gmd:CI_ResponsibleParty>
+      <gmd:organisationName><gco:CharacterString>University of Prince Edward Island</gco:CharacterString></gmd:organisationName>
+      <gmd:role><gmd:CI_RoleCode codeListValue="pointOfContact" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode">pointOfContact</gmd:CI_RoleCode></gmd:role>
+    </gmd:CI_ResponsibleParty>
+  </gmd:contact>
+  <gmd:dateStamp><gco:Date>2026-06-09</gco:Date></gmd:dateStamp>
+  <gmd:metadataStandardName><gco:CharacterString>ISO 19115-2 Geographic Information - Metadata - Part 2: Extensions for imagery and gridded data</gco:CharacterString></gmd:metadataStandardName>
+  <gmd:metadataStandardVersion><gco:CharacterString>ISO 19115-2:2009</gco:CharacterString></gmd:metadataStandardVersion>
+  <gmd:referenceSystemInfo>
+    <gmd:MD_ReferenceSystem><gmd:referenceSystemIdentifier><gmd:RS_Identifier>
+      <gmd:code><gco:CharacterString>EPSG:3005</gco:CharacterString></gmd:code>
+      <gmd:codeSpace><gco:CharacterString>NAD83 / BC Albers (equal-area conic)</gco:CharacterString></gmd:codeSpace>
+    </gmd:RS_Identifier></gmd:referenceSystemIdentifier></gmd:MD_ReferenceSystem>
+  </gmd:referenceSystemInfo>
+  <gmd:identificationInfo>
+    <gmd:MD_DataIdentification>
+      <gmd:citation><gmd:CI_Citation>
+        <gmd:title><gco:CharacterString>Wildfire susceptibility modelling dataset for British Columbia (2000-2024): conditioning factors at fire and non-fire points</gco:CharacterString></gmd:title>
+        <gmd:date><gmd:CI_Date><gmd:date><gco:Date>2026-06-09</gco:Date></gmd:date>
+          <gmd:dateType><gmd:CI_DateTypeCode codeListValue="publication" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode">publication</gmd:CI_DateTypeCode></gmd:dateType></gmd:CI_Date></gmd:date>
+        <gmd:identifier><gmd:MD_Identifier><gmd:code><gco:CharacterString>doi:10.5281/zenodo.20389083</gco:CharacterString></gmd:code></gmd:MD_Identifier></gmd:identifier>
+      </gmd:CI_Citation></gmd:citation>
+      <gmd:abstract><gco:CharacterString>Point-level modelling dataset of 1,992 wildfire (burned area >= 70 ha, 2000-2024) and 1,992 spatially independent non-wildfire locations across British Columbia, Canada, each attributed with 18 climatic, vegetation, topographic and anthropogenic conditioning factors used to train LSTM/BiLSTM models optimised with particle swarm optimisation. Companion files provide the 100 ha and 200 ha thresholds and ten random-seed realisations for sensitivity analysis.</gco:CharacterString></gmd:abstract>
+      <gmd:resourceConstraints><gmd:MD_LegalConstraints>
+        <gmd:useConstraints><gmd:MD_RestrictionCode codeListValue="license" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode">license</gmd:MD_RestrictionCode></gmd:useConstraints>
+        <gmd:otherConstraints><gco:CharacterString>Creative Commons Attribution 4.0 International (CC-BY 4.0)</gco:CharacterString></gmd:otherConstraints>
+      </gmd:MD_LegalConstraints></gmd:resourceConstraints>
+      <gmd:spatialRepresentationType><gmd:MD_SpatialRepresentationTypeCode codeListValue="vector" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode">vector</gmd:MD_SpatialRepresentationTypeCode></gmd:spatialRepresentationType>
+      <gmd:language><gco:CharacterString>eng</gco:CharacterString></gmd:language>
+      <gmd:topicCategory><gmd:MD_TopicCategoryCode>environment</gmd:MD_TopicCategoryCode></gmd:topicCategory>
+      <gmd:topicCategory><gmd:MD_TopicCategoryCode>geoscientificInformation</gmd:MD_TopicCategoryCode></gmd:topicCategory>
+      <gmd:extent><gmd:EX_Extent>
+        <gmd:geographicElement><gmd:EX_GeographicBoundingBox>
+          <gmd:westBoundLongitude><gco:Decimal>-139.06</gco:Decimal></gmd:westBoundLongitude>
+          <gmd:eastBoundLongitude><gco:Decimal>-114.03</gco:Decimal></gmd:eastBoundLongitude>
+          <gmd:southBoundLatitude><gco:Decimal>48.30</gco:Decimal></gmd:southBoundLatitude>
+          <gmd:northBoundLatitude><gco:Decimal>60.00</gco:Decimal></gmd:northBoundLatitude>
+        </gmd:EX_GeographicBoundingBox></gmd:geographicElement>
+        <gmd:temporalElement><gmd:EX_TemporalExtent><gmd:extent><gml:TimePeriod gml:id="T1">
+          <gml:beginPosition>2000-01-01</gml:beginPosition><gml:endPosition>2024-12-31</gml:endPosition>
+        </gml:TimePeriod></gmd:extent></gmd:EX_TemporalExtent></gmd:temporalElement>
+      </gmd:EX_Extent></gmd:extent>
+    </gmd:MD_DataIdentification>
+  </gmd:identificationInfo>
+  <gmd:distributionInfo><gmd:MD_Distribution><gmd:transferOptions><gmd:MD_DigitalTransferOptions>
+    <gmd:onLine><gmd:CI_OnlineResource><gmd:linkage><gmd:URL>https://doi.org/10.5281/zenodo.20389083</gmd:URL></gmd:linkage>
+      <gmd:name><gco:CharacterString>Archived dataset, code and metadata (Zenodo)</gco:CharacterString></gmd:name></gmd:CI_OnlineResource></gmd:onLine>
+    <gmd:onLine><gmd:CI_OnlineResource><gmd:linkage><gmd:URL>https://github.com/Saadkhan32/wildfire-bc-bilstm-pso</gmd:URL></gmd:linkage>
+      <gmd:name><gco:CharacterString>Source code repository (GitHub)</gco:CharacterString></gmd:name></gmd:CI_OnlineResource></gmd:onLine>
+  </gmd:MD_DigitalTransferOptions></gmd:transferOptions></gmd:MD_Distribution></gmd:distributionInfo>
+  <gmd:dataQualityInfo><gmd:DQ_DataQuality>
+    <gmd:scope><gmd:DQ_Scope><gmd:level><gmd:MD_ScopeCode codeListValue="dataset" codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode">dataset</gmd:MD_ScopeCode></gmd:level></gmd:DQ_Scope></gmd:scope>
+    <gmd:lineage><gmd:LI_Lineage><gmd:statement><gco:CharacterString>Wildfire perimeters (>= 70 ha, 2000-2024) were obtained from the Canadian Wildland Fire Information System and the National Fire Database; spatially independent non-wildfire points were generated with a 20 km exclusion buffer. Conditioning factors were derived from SRTM (topography), ESRI/Sentinel-2 (land cover), TerraClimate and ERA5-Land (climate) and national road, settlement and hydrography layers, resampled to a 1.5 km grid. All layers were projected to NAD83 / BC Albers (EPSG:3005). Predictors were min-max normalised; features were selected by recursive feature elimination on training folds only; models were evaluated with ten-fold spatial-block cross-validation.</gco:CharacterString></gmd:statement></gmd:LI_Lineage></gmd:lineage>
+  </gmd:DQ_DataQuality></gmd:dataQualityInfo>
+</gmi:MI_Metadata>

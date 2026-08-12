@@ -1,0 +1,25 @@
+column,description,units
+UniqueID,Unique point identifier,-
+Longitude,Longitude of point,decimal degrees (WGS84)
+Latitude,Latitude of point,decimal degrees (WGS84)
+Status,"Class label (1 = wildfire ≥70 ha, 0 = non-wildfire)",binary
+Aspect,Terrain aspect,degrees
+Slope,Terrain slope,degrees
+Elevation,Elevation (SRTM),m
+TWI,Topographic Wetness Index,index
+Profile_Curvature,Profile curvature,1/m
+Plan_Curvature,Plan curvature,1/m
+NDVI,Normalized Difference Vegetation Index (mean),index
+LULC,Land-use/land-cover class (ESRI/Sentinel-2),categorical
+Max_Temperature,Mean maximum temperature,°C
+Precipitation,Mean total precipitation,mm
+WS,Mean wind speed,m/s
+Specific_Humidity,ERA5-Land mean specific humidity,kg/kg
+AET,Actual evapotranspiration,mm
+DSI,Drought Severity Index,index
+Soil_Moisture,Soil moisture,mm
+Distance_roads,Euclidean distance to nearest road,m
+Distance_rivers,Euclidean distance to nearest river,m
+x_epsg3005,Cell-centre easting (NAD83 BC Albers),metres (EPSG:3005)
+y_epsg3005,Cell-centre northing (NAD83 BC Albers),metres (EPSG:3005)
+probability,Modelled relative wildfire susceptibility index (0-1),index

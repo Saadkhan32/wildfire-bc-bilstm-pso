@@ -1,0 +1,39 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "../../data/raw/oni.ascii.txt",
+  "dc:title": "Oceanic Nino Index (ONI), NOAA CPC",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dialect": {
+    "header": true,
+    "encoding": "utf-8",
+    "delimiter": ","
+  },
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "SEAS",
+        "titles": "SEAS",
+        "datatype": "string",
+        "dc:description": "Three-month season label (e.g. DJF)"
+      },
+      {
+        "name": "YR",
+        "titles": "YR",
+        "datatype": "integer",
+        "dc:description": "Year"
+      },
+      {
+        "name": "TOTAL",
+        "titles": "TOTAL",
+        "datatype": "number",
+        "dc:description": "Nino-3.4 region SST (degrees C)"
+      },
+      {
+        "name": "ANOM",
+        "titles": "ANOM",
+        "datatype": "number",
+        "dc:description": "ONI = 3-month running SST anomaly (degrees C)"
+      }
+    ]
+  }
+}

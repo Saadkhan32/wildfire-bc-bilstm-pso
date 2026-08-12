@@ -1,0 +1,41 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "BC_ge70ha_annual_2000_2024.csv",
+  "dc:title": "Annual large-wildfire record for British Columbia (>=70 ha), 2000-2024",
+  "dc:description": "Annual count of wildfires of at least 70 ha and the corresponding total area burned, used for the Theil-Sen trend analysis.",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dc:creator": "Khan, M.S.; Farooque, A.A.; Al-Mughrabi, T.; Malekian, R.; Wang, X.; Esau, T.J.; Uz Zaman, Q.",
+  "dc:publisher": "Zenodo",
+  "dc:identifier": "https://doi.org/10.5281/zenodo.20389083",
+  "dc:spatial": {
+    "crs": "EPSG:3005",
+    "name": "NAD83 / BC Albers"
+  },
+  "dc:temporal": {
+    "start": "2000-01-01",
+    "end": "2024-12-31"
+  },
+  "dc:modified": "2026-08-11",
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "year",
+        "titles": "year",
+        "datatype": "integer",
+        "dc:description": "Column 'year' of BC_ge70ha_annual_2000_2024.csv."
+      },
+      {
+        "name": "n_fires_ge70ha",
+        "titles": "n_fires_ge70ha",
+        "datatype": "integer",
+        "dc:description": "Column 'n_fires_ge70ha' of BC_ge70ha_annual_2000_2024.csv."
+      },
+      {
+        "name": "area_burned_ha",
+        "titles": "area_burned_ha",
+        "datatype": "decimal",
+        "dc:description": "Column 'area_burned_ha' of BC_ge70ha_annual_2000_2024.csv."
+      }
+    ]
+  }
+}

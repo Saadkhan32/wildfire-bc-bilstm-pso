@@ -1,0 +1,117 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "../../data/climate/BC_TerraClimate_monthly_SOIL_2000_2024.csv",
+  "dc:title": "BC_TerraClimate_monthly_SOIL_2000_2024",
+  "dc:license": "https://creativecommons.org/licenses/by/4.0/",
+  "dialect": {
+    "header": true,
+    "encoding": "utf-8",
+    "delimiter": ","
+  },
+  "tableSchema": {
+    "columns": [
+      {
+        "name": "system:index",
+        "titles": "system:index",
+        "datatype": "string",
+        "dc:description": "system:index"
+      },
+      {
+        "name": "count",
+        "titles": "count",
+        "datatype": "number",
+        "dc:description": "count"
+      },
+      {
+        "name": "date",
+        "titles": "date",
+        "datatype": "number",
+        "dc:description": "date"
+      },
+      {
+        "name": "max",
+        "titles": "max",
+        "datatype": "number",
+        "dc:description": "max"
+      },
+      {
+        "name": "mean",
+        "titles": "mean",
+        "datatype": "number",
+        "dc:description": "mean"
+      },
+      {
+        "name": "median",
+        "titles": "median",
+        "datatype": "number",
+        "dc:description": "median"
+      },
+      {
+        "name": "min",
+        "titles": "min",
+        "datatype": "number",
+        "dc:description": "min"
+      },
+      {
+        "name": "month",
+        "titles": "month",
+        "datatype": "number",
+        "dc:description": "month"
+      },
+      {
+        "name": "p25",
+        "titles": "p25",
+        "datatype": "number",
+        "dc:description": "p25"
+      },
+      {
+        "name": "p5",
+        "titles": "p5",
+        "datatype": "number",
+        "dc:description": "p5"
+      },
+      {
+        "name": "p75",
+        "titles": "p75",
+        "datatype": "number",
+        "dc:description": "p75"
+      },
+      {
+        "name": "p95",
+        "titles": "p95",
+        "datatype": "number",
+        "dc:description": "p95"
+      },
+      {
+        "name": "stdDev",
+        "titles": "stdDev",
+        "datatype": "number",
+        "dc:description": "stdDev"
+      },
+      {
+        "name": "unit",
+        "titles": "unit",
+        "datatype": "number",
+        "dc:description": "unit"
+      },
+      {
+        "name": "variable",
+        "titles": "variable",
+        "datatype": "number",
+        "dc:description": "variable"
+      },
+      {
+        "name": "year",
+        "titles": "year",
+        "datatype": "number",
+        "dc:description": "year"
+      },
+      {
+        "name": ".geo",
+        "titles": ".geo",
+        "datatype": "number",
+        "dc:description": ".geo"
+      }
+    ]
+  }
+}
