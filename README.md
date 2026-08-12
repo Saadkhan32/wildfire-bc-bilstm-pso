@@ -54,8 +54,8 @@ not exist in a clone at all — `models.zip` creates it.
 
 | Archive | Contains | Needed by |
 |---|---|---|
-| `data.zip` (~358 MB) | `data/` — rasters, climate series, SHAP values, training points | everyone reproducing results |
-| `models.zip` (~71 MB) | `models/` — trained Keras weights + CV metrics | everyone reproducing results |
+| `data.zip` (~239 MB) | `data/` — rasters, climate series, SHAP values, training points | everyone reproducing results |
+| `models.zip` (~63 MB) | `models/` — trained Keras weights + CV metrics | everyone reproducing results |
 | `code.zip` (small) | `src/`, `R/`, `notebooks/` — snapshot of the repository code | **Zenodo-only users** (no git) |
 | `metadata.zip` (small) | `metadata/` — snapshot of the repository metadata | **Zenodo-only users** (no git) |
 
@@ -176,8 +176,8 @@ SUMMARY:  <n> pass | <n> warn | 0 fail
 - **Fresh clone (code only):** all code checks pass; the large data files are
   reported as warnings. That is the expected result and confirms the
   environment is correct.
-- **Full reproduction:** download `data.zip` (~358 MB) and `models.zip`
-  (~71 MB) from the Zenodo record — these two only, see *Two ways to use this
+- **Full reproduction:** download `data.zip` (~239 MB) and `models.zip`
+  (~63 MB) from the Zenodo record — these two only, see *Two ways to use this
   package* above — and unpack both into the repository root. They add files
   without touching any file git put there, so no overwrite prompts appear.
   Then re-run step 4. The test then also reproduces the manuscript's Theil-Sen

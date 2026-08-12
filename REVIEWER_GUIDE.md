@@ -28,11 +28,16 @@ few scripts expect them.
 ## 2. Set up the environment
 
 ```bash
-conda env create -f environment.yml     # pinned versions: environment.lock.yml
+conda env create -f environment.yml
 conda activate wildfire
-Rscript -e "renv::restore()"            # R components (terra, sf, blockCV)
-python test_reproducibility.py          # environment + headline-metric smoke test
+Rscript -e "renv::restore()"
+python test_reproducibility.py
 ```
+
+Line 1 builds the pinned Python environment (exact versions:
+`environment.lock.yml`); line 3 restores the R components (terra, sf,
+blockCV) and is needed only for the R-based figures; line 4 is the
+environment + headline-metric smoke test.
 
 Random seeds are fixed (42); deterministic steps reproduce exactly.
 
