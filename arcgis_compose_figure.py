@@ -357,7 +357,7 @@ for i, (name, title, kind) in enumerate(PANELS):
     # graticule: ticks all round, labels on outer panels
     tk = 0.055 / PW                                   # tick length (axes frac)
     show_lon = True
-    show_lat = True
+    show_lat = (c == 0)      # latitude labels only on the first map of each row
     for f, v in CB:
         axm.plot([f, f], [0, -tk * ASPECT], transform=axm.transAxes,
                  color="0.15", lw=0.7, clip_on=False)
