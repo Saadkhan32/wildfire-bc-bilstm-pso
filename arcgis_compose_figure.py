@@ -356,8 +356,8 @@ for i, (name, title, kind) in enumerate(PANELS):
 
     # graticule: ticks all round, labels on outer panels
     tk = 0.055 / PW                                   # tick length (axes frac)
-    show_lon = (i == last_map_in_col[c])
-    show_lat = (c == 0)
+    show_lon = True
+    show_lat = True
     for f, v in CB:
         axm.plot([f, f], [0, -tk * ASPECT], transform=axm.transAxes,
                  color="0.15", lw=0.7, clip_on=False)
@@ -438,7 +438,10 @@ axf.add_patch(plt.Polygon([[0.5, 0.72], [0.70, 0.06], [0.5, 0.20]],
 # exact scale bar: panel width represents (C1-C0) cells x 1.5 km
 KM_PER_PANEL = (C1 - C0) * abs(TR.a) / 1000.0
 axs = ax_at(x + PW * 0.02, y + TITLE_H + PH * 0.44, PW * 0.96, PH * 0.22)
-axs.set_xlim(-150, 830); axs.set_ylim(0, 1); axs.axis("off")
+# axis span tied to the panel scale so the bar is geometrically exact:
+# panels render (X1-X0) metres across PW cm; this axes is PW*0.96 cm wide
+KM_AX = (X1 - X0) / 1000.0 * 0.96
+axs.set_xlim(-150, -150 + KM_AX); axs.set_ylim(0, 1); axs.axis("off")
 BAR = 500.0
 axs.add_patch(Rectangle((0, 0.52), BAR / 2, 0.20, facecolor="black",
                         edgecolor="black", lw=0.6))
