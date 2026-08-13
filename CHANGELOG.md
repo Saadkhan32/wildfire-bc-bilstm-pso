@@ -1,6 +1,12 @@
 # Changelog
 
 ## v1.2.1 - 2026-08-12
+- New ArcGIS Pro cartography pipeline for the conditioning-factor figure:
+  arcgis_make_maps.py exports the eighteen 1.5 km predictor rasters from
+  ArcGIS Pro with native symbology at 600 dpi, and arcgis_compose_figure.py
+  assembles the single-page journal figure (labelled graticule frames,
+  per-panel colour bars sampled from the Pro rendering, LULC class legend,
+  north arrow, exact 500 km scale bar) -> figs/Fig_predictors_final.png/.tif.
 - New make_fig_predictors.py (package root): journal-standard single-page
   grid of the eighteen 1.5 km conditioning-factor rasters (panel letters,
   units, rounded 2-98% colour scales, LULC class legend, north arrow, exact

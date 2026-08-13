@@ -86,7 +86,7 @@ Script index: `src/README.md`.
 | ENSO/PDO teleconnections (Fig. 18, Sect. 3.9) | `reproduce.py` step 6; correlations shipped: `tables/T_teleconnection_burnedarea_corr.csv`; stats: `src/specific_humidity_update/Section3-9_teleconnection_stats_specific_humidity.py` |
 | Cross-border comparison (Fig. S6b) | inputs shipped (`data/cross_border_US/`, `data/susceptibility/`); script: `src/cross_border_c4.py` (staged workspace) |
 | Model training from scratch | staged workflow `src/revision_step*.py` / `src/c8c11_step*.py`; optional — trained models are shipped |
-| Study-area / data-prep maps | GIS cartography (ArcGIS Pro, EPSG:3005) from layers listed in `DATA_SOURCES.md`; the conditioning-factor grid is fully scripted: `python make_fig_predictors.py` from the shipped `data/rasters/` |
+| Study-area / data-prep maps | GIS cartography (ArcGIS Pro, EPSG:3005) from layers listed in `DATA_SOURCES.md`; the conditioning-factor grid is scripted end to end: `arcgis_make_maps.py` (ArcGIS Pro symbology, 600 dpi) + `arcgis_compose_figure.py`, or `make_fig_predictors.py` for a pure-Python version from the shipped `data/rasters/` |
 
 *ROC sanity line:* each model's in-sample AUC is compared against its stored
 out-of-fold CV AUC. In-sample is expectedly optimistic — most for the
