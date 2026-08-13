@@ -1,6 +1,11 @@
 # Changelog
 
 ## v1.2.1 - 2026-08-12
+- New make_fig_predictors.py (package root): journal-standard single-page
+  grid of the eighteen 1.5 km conditioning-factor rasters (panel letters,
+  units, rounded 2-98% colour scales, LULC class legend, north arrow, exact
+  500 km scale bar), rendered from the shipped data/rasters/; outputs
+  figs/Fig_predictors_grid.{png,pdf,tif} at 600 dpi.
 - New make_fig12_onepage.py (package root): single-page portrait composite of
   the nine seasonal climate variables (manuscript Fig. 7) - Theil-Sen trends
   with 95% CI bands plus wildfire/non-wildfire distributions - computed
