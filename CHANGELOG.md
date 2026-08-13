@@ -1,12 +1,17 @@
 # Changelog
 
 ## v1.2.1 - 2026-08-12
-- Documentation polish (GitHub): README gains a quick start, contents bar,
-  current version DOIs and the expected outputs of the smoke test and of
-  reproduce.py; the reviewer guide gains a 10-minute verification path,
-  expected summary lines, and a note explaining the ROC step's informational
-  sanity flag. No code or data changes; the published Zenodo v1.2.0 record is
-  unaffected.
+- New make_fig12_onepage.py (package root): single-page portrait composite of
+  the nine seasonal climate variables (manuscript Fig. 7) - Theil-Sen trends
+  with 95% CI bands plus wildfire/non-wildfire distributions - computed
+  entirely from the five git-tracked monthly CSVs; outputs
+  figs/Fig12_climate_onepage.{png,pdf,tif} at 600 dpi.
+- Documentation rewrite (GitHub): README condensed around a quick start,
+  contents bar, current version DOIs and the expected outputs of the smoke
+  test and of reproduce.py; the reviewer guide gains a 10-minute
+  verification path, expected summary lines, and a note explaining the ROC
+  step's informational sanity flag. No code or data changes; the published
+  Zenodo v1.2.0 record is unaffected.
 
 ## v1.2.0 - 2026-08-12
 - Zenodo archives restructured (new Zenodo version): data.zip, models.zip and

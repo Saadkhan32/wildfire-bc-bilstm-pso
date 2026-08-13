@@ -124,3 +124,7 @@ data/susceptibility/
 data/processed/fires_geq_70ha.*
 models/**
 !models/.gitkeep
+
+# ad-hoc manuscript-editing helpers (local only)
+scan_manuscript*.py
+update_manuscript*.py
