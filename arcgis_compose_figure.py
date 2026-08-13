@@ -151,11 +151,11 @@ def ramp_from_render(name, crop):
     """Sample the ArcGIS ramp: pair raster values with rendered colours."""
     a = common_window(name)
     small = np.asarray(crop.resize((a.shape[1], a.shape[0]), Image.NEAREST))
+    from scipy.ndimage import binary_erosion
     ok = ~np.ma.getmaskarray(a)
-    v = np.asarray(a[ok], dtype=float)
+    ok = binary_erosion(ok, iterations=1)   # drop edge pixels (colour blending)
+    v = np.asarray(a.filled(0)[ok], dtype=float)
     c = small[ok].astype(float) / 255.0
-    solid = c.min(axis=1) < 0.92          # drop coastline/anti-aliased pixels
-    v, c = v[solid], c[solid]
     lo, hi = np.percentile(v, 2), np.percentile(v, 98)
     sel = (v >= lo) & (v <= hi)
     v, c = v[sel], c[sel]
@@ -179,11 +179,11 @@ def full_ramp(name, crop):
     data range (independent of the stretch Pro applied)."""
     a = common_window(name)
     small = np.asarray(crop.resize((a.shape[1], a.shape[0]), Image.NEAREST))
+    from scipy.ndimage import binary_erosion
     ok = ~np.ma.getmaskarray(a)
-    v = np.asarray(a[ok], dtype=float)
+    ok = binary_erosion(ok, iterations=1)   # drop edge pixels (colour blending)
+    v = np.asarray(a.filled(0)[ok], dtype=float)
     c = small[ok].astype(float) / 255.0
-    solid = c.min(axis=1) < 0.92          # drop coastline/anti-aliased pixels
-    v, c = v[solid], c[solid]
     vmin, vmax = np.percentile(v, 0.05), np.percentile(v, 99.95)
     n = 256
     idx = np.clip(((v - vmin) / (vmax - vmin) * n).astype(int), 0, n - 1)
@@ -450,9 +450,7 @@ axs.text(BAR + 55, 0.40, "500 km", ha="center", va="top",
          fontsize=FS_NOTE - 0.6)
 axn = ax_at(x, y + TITLE_H + PH * 0.70, PW + GAP_X, PH * 0.30 + LONLAB_H + CBAR_H + CBLAB_H)
 axn.axis("off")
-axn.text(0, 1.0, "Grid: 1.5 km cells\nGraticule: WGS 84\n"
-                 "Stretch: full data range\n"
-                 "Symbology and north arrow:\nArcGIS Pro",
+axn.text(0, 1.0, "Grid: 1.5 km cells\nGraticule: WGS 84",
          fontsize=FS_NOTE, transform=axn.transAxes, va="top", linespacing=1.5)
 
 os.makedirs(os.path.join(HERE, "figs"), exist_ok=True)
