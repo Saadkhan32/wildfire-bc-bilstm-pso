@@ -90,10 +90,10 @@ def render_rect(img_w, img_h, grid_w, grid_h):
     return fl + (fw - dw) / 2, ft + (fh - dh) / 2, dw, dh
 
 
-# --- data window (BC shape) in raster cells, shared by all panels ---
+# --- common target extent: the BC data window of the Elevation grid ---
 with rasterio.open(os.path.join(RAS, "Elevation.tif")) as r:
     m0 = r.read(1, masked=True)
-    GW, GH, TR, CRS = r.width, r.height, r.transform, r.crs
+    TR, CRS = r.transform, r.crs
 rows = np.where(~m0.mask.all(axis=1))[0]
 cols = np.where(~m0.mask.all(axis=0))[0]
 R0, R1, C0, C1 = rows.min(), rows.max() + 1, cols.min(), cols.max() + 1
@@ -103,23 +103,59 @@ Y1 = TR.f + R0 * TR.e
 Y0 = TR.f + R1 * TR.e
 ASPECT = (X1 - X0) / (Y1 - Y0)
 
+# every raster has its own extent; register each export to the common window
+_META = {}
+
+
+def meta(name):
+    if name not in _META:
+        with rasterio.open(os.path.join(RAS, name + ".tif")) as r:
+            _META[name] = (r.width, r.height, r.bounds, r.transform)
+    return _META[name]
+
 
 def crop_panel(name):
+    """Crop this panel's export so it represents EXACTLY the common window
+    (X0..X1, Y0..Y1), padding with white where the raster does not reach."""
     im = Image.open(os.path.join(EXP, name + ".png")).convert("RGB")
-    dl, dt, dw, dh = render_rect(im.size[0], im.size[1], GW, GH)
-    box = (dl + C0 / GW * dw, dt + R0 / GH * dh,
-           dl + C1 / GW * dw, dt + R1 / GH * dh)
-    return im.crop(tuple(int(round(v)) for v in box))
+    rw, rh, B, _ = meta(name)
+    dl, dt, dw, dh = render_rect(im.size[0], im.size[1], rw, rh)
+    sx = dw / (B.right - B.left)          # px per metre in this export
+    sy = dh / (B.top - B.bottom)
+    px0 = dl + (X0 - B.left) * sx
+    px1 = dl + (X1 - B.left) * sx
+    py0 = dt + (B.top - Y1) * sy
+    py1 = dt + (B.top - Y0) * sy
+    out_w, out_h = int(round(px1 - px0)), int(round(py1 - py0))
+    canvas = Image.new("RGB", (out_w, out_h), "white")
+    ix0, iy0 = max(0, int(round(px0))), max(0, int(round(py0)))
+    ix1 = min(im.size[0], int(round(px1)))
+    iy1 = min(im.size[1], int(round(py1)))
+    if ix1 > ix0 and iy1 > iy0:
+        part = im.crop((ix0, iy0, ix1, iy1))
+        canvas.paste(part, (int(round(ix0 - px0)), int(round(iy0 - py0))))
+    return canvas
+
+
+def common_window(name):
+    """Read this raster over the common window (boundless, masked)."""
+    from rasterio.windows import from_bounds
+    with rasterio.open(os.path.join(RAS, name + ".tif")) as r:
+        win = from_bounds(X0, Y0, X1, Y1, r.transform)
+        a = r.read(1, window=win, boundless=True, masked=True,
+                   fill_value=r.nodata if r.nodata is not None else 0)
+    return a
 
 
 def ramp_from_render(name, crop):
     """Sample the ArcGIS ramp: pair raster values with rendered colours."""
-    with rasterio.open(os.path.join(RAS, name + ".tif")) as r:
-        a = r.read(1, masked=True)[R0:R1, C0:C1]
+    a = common_window(name)
     small = np.asarray(crop.resize((a.shape[1], a.shape[0]), Image.NEAREST))
-    ok = ~a.mask
+    ok = ~np.ma.getmaskarray(a)
     v = np.asarray(a[ok], dtype=float)
     c = small[ok].astype(float) / 255.0
+    solid = c.min(axis=1) < 0.92          # drop coastline/anti-aliased pixels
+    v, c = v[solid], c[solid]
     lo, hi = np.percentile(v, 2), np.percentile(v, 98)
     sel = (v >= lo) & (v <= hi)
     v, c = v[sel], c[sel]
@@ -141,12 +177,13 @@ def ramp_from_render(name, crop):
 def full_ramp(name, crop):
     """The ArcGIS ramp itself: colour as a function of value over the full
     data range (independent of the stretch Pro applied)."""
-    with rasterio.open(os.path.join(RAS, name + ".tif")) as r:
-        a = r.read(1, masked=True)[R0:R1, C0:C1]
+    a = common_window(name)
     small = np.asarray(crop.resize((a.shape[1], a.shape[0]), Image.NEAREST))
-    ok = ~a.mask
+    ok = ~np.ma.getmaskarray(a)
     v = np.asarray(a[ok], dtype=float)
     c = small[ok].astype(float) / 255.0
+    solid = c.min(axis=1) < 0.92          # drop coastline/anti-aliased pixels
+    v, c = v[solid], c[solid]
     vmin, vmax = np.percentile(v, 0.05), np.percentile(v, 99.95)
     n = 256
     idx = np.clip(((v - vmin) / (vmax - vmin) * n).astype(int), 0, n - 1)
